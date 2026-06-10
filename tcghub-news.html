@@ -1,0 +1,710 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>TCG Hub — 소식</title>
+<link href="https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+:root {
+  --brand: #19DFDF;
+  --brand-subtle: #E8FAFA;
+  --brand-text: #066666;
+  --price-up: #16A34A;
+  --price-up-subtle: #DCFCE7;
+  --price-up-text: #166534;
+  --pk: #D4A800;
+  --pk-subtle: #FEF9C3;
+  --pk-text: #7a5c00;
+  --op: #CC2244;
+  --op-subtle: #FEE2E2;
+  --op-text: #991B1B;
+  --bg-page: #F7F6F2;
+  --bg-surface: #FFFFFF;
+  --bg-muted: #EDECE8;
+  --border: #D9D8D3;
+  --border-subtle: #EDECE8;
+  --text-primary: #0D0D0D;
+  --text-secondary: #666560;
+  --text-tertiary: #999894;
+  --radius-sm: 6px;
+  --radius-md: 10px;
+  --radius-lg: 14px;
+  --shadow-sm: 0 1px 3px rgba(0,0,0,0.06);
+  --shadow-md: 0 4px 16px rgba(0,0,0,0.1);
+  --font: 'Noto Sans KR', sans-serif;
+  --sidebar-w: 200px;
+  --topbar-h: 52px;
+}
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+body { font-family: var(--font); background: var(--bg-page); color: var(--text-primary); font-size: 14px; line-height: 1.5; -webkit-font-smoothing: antialiased; }
+button { border: none; background: none; cursor: pointer; font-family: var(--font); }
+
+/* TOPBAR */
+.topbar { position: fixed; top: 0; left: 0; right: 0; z-index: 100; height: var(--topbar-h); background: var(--bg-surface); border-bottom: 1px solid var(--border-subtle); display: flex; align-items: center; }
+.topbar-logo { width: var(--sidebar-w); flex-shrink: 0; display: flex; align-items: center; gap: 8px; padding: 0 20px; height: 100%; border-right: 1px solid var(--border-subtle); }
+.logo-mark { width: 28px; height: 28px; border-radius: 8px; background: var(--brand); display: flex; align-items: center; justify-content: center; font-size: 14px; }
+.logo-text { font-size: 15px; font-weight: 700; letter-spacing: -0.01em; }
+.logo-sub { font-size: 10px; color: var(--text-tertiary); margin-top: 1px; }
+.topbar-center { flex: 1; padding: 0 20px; }
+.search-wrap { position: relative; width: 300px; }
+.search-wrap input { width: 100%; height: 34px; background: var(--bg-page); border: 1px solid var(--border); border-radius: 20px; padding: 0 12px 0 34px; font-size: 13px; font-family: var(--font); color: var(--text-primary); outline: none; transition: border-color 0.15s; }
+.search-wrap input:focus { border-color: var(--brand); }
+.search-wrap input::placeholder { color: var(--text-tertiary); }
+.search-icon { position: absolute; left: 11px; top: 50%; transform: translateY(-50%); color: var(--text-tertiary); font-size: 13px; }
+.topbar-right { display: flex; align-items: center; gap: 10px; padding-right: 20px; }
+.btn-avatar { width: 32px; height: 32px; border-radius: 50%; background: var(--brand-subtle); color: var(--brand-text); font-size: 12px; font-weight: 600; display: flex; align-items: center; justify-content: center; border: 1.5px solid var(--brand); cursor: pointer; }
+
+/* LAYOUT */
+.body { display: flex; padding-top: var(--topbar-h); min-height: 100vh; }
+.sidebar { width: var(--sidebar-w); position: fixed; top: var(--topbar-h); left: 0; bottom: 0; background: var(--bg-surface); border-right: 1px solid var(--border-subtle); padding: 16px 12px; display: flex; flex-direction: column; overflow-y: auto; z-index: 50; }
+.nav-section { font-size: 10px; font-weight: 500; color: var(--text-tertiary); letter-spacing: 0.07em; padding: 0 8px; margin-bottom: 6px; margin-top: 16px; }
+.nav-section:first-child { margin-top: 0; }
+.nav-item { display: flex; align-items: center; gap: 9px; padding: 8px 10px; border-radius: var(--radius-md); font-size: 13px; color: var(--text-secondary); cursor: pointer; transition: all 0.12s; margin-bottom: 1px; }
+.nav-item:hover { background: var(--bg-page); color: var(--text-primary); }
+.nav-item.active { background: var(--brand-subtle); color: var(--brand-text); font-weight: 600; }
+.nav-icon { font-size: 15px; width: 18px; text-align: center; flex-shrink: 0; }
+.nav-brand-badge { font-size: 10px; font-weight: 600; padding: 2px 8px; border-radius: 4px; }
+.nav-brand-badge.pk { background: var(--pk-subtle); color: var(--pk-text); }
+.nav-brand-badge.op { background: var(--op-subtle); color: var(--op-text); }
+.sidebar-bottom { margin-top: auto; padding-top: 12px; border-top: 1px solid var(--border-subtle); }
+.btn-install { width: 100%; padding: 8px 10px; border: 1px solid var(--border); border-radius: var(--radius-md); font-size: 12px; color: var(--text-secondary); background: transparent; text-align: left; cursor: pointer; }
+
+.main { margin-left: var(--sidebar-w); flex: 1; padding: 24px; max-width: 1100px; }
+
+/* PAGE HEADER */
+.page-header { margin-bottom: 20px; }
+.page-title { font-size: 22px; font-weight: 700; letter-spacing: -0.02em; margin-bottom: 4px; }
+.page-desc { font-size: 13px; color: var(--text-secondary); }
+
+/* TABS */
+.tabs {
+  display: flex; gap: 2px;
+  border-bottom: 1px solid var(--border-subtle);
+  margin-bottom: 24px;
+  position: sticky; top: var(--topbar-h); z-index: 40;
+  background: var(--bg-page); padding-top: 8px;
+}
+.tab {
+  padding: 10px 16px; font-size: 13px; font-weight: 500;
+  color: var(--text-tertiary); cursor: pointer;
+  border-bottom: 2px solid transparent; margin-bottom: -1px;
+  transition: all 0.12s; display: flex; align-items: center; gap: 6px;
+  white-space: nowrap;
+}
+.tab:hover { color: var(--text-primary); }
+.tab.active { color: var(--brand-text); border-bottom-color: var(--brand); font-weight: 600; }
+
+/* TAB PANELS */
+.tab-panel { display: none; }
+.tab-panel.active { display: block; }
+
+/* =====================
+   뉴스 탭
+===================== */
+.news-featured {
+  background: var(--bg-surface); border: 1px solid var(--border);
+  border-radius: var(--radius-lg); overflow: hidden;
+  margin-bottom: 16px; cursor: pointer;
+  display: flex; box-shadow: var(--shadow-sm);
+  transition: all 0.15s;
+}
+.news-featured:hover { box-shadow: var(--shadow-md); transform: translateY(-1px); }
+.news-featured-thumb {
+  width: 240px; flex-shrink: 0;
+  background: var(--bg-muted);
+  display: flex; align-items: center; justify-content: center;
+  font-size: 64px;
+}
+.news-featured-body { padding: 20px 22px; flex: 1; }
+.news-featured-tag { font-size: 11px; font-weight: 600; color: var(--brand-text); margin-bottom: 8px; display: flex; align-items: center; gap: 6px; }
+.news-featured-title { font-size: 18px; font-weight: 700; line-height: 1.35; margin-bottom: 8px; letter-spacing: -0.01em; }
+.news-featured-desc { font-size: 13px; color: var(--text-secondary); line-height: 1.6; margin-bottom: 12px; }
+.news-featured-meta { font-size: 11px; color: var(--text-tertiary); display: flex; align-items: center; gap: 8px; }
+
+.news-grid { display: grid; grid-template-columns: repeat(3, minmax(0,1fr)); gap: 10px; }
+.news-card {
+  background: var(--bg-surface); border: 1px solid var(--border);
+  border-radius: var(--radius-lg); overflow: hidden;
+  cursor: pointer; transition: all 0.15s; box-shadow: var(--shadow-sm);
+}
+.news-card:hover { box-shadow: var(--shadow-md); transform: translateY(-1px); }
+.news-card-thumb {
+  width: 100%; height: 120px;
+  display: flex; align-items: center; justify-content: center;
+  font-size: 40px; background: var(--bg-muted);
+}
+.news-card-body { padding: 12px 14px; }
+.news-tag { font-size: 10px; font-weight: 600; color: var(--brand-text); margin-bottom: 5px; }
+.news-title { font-size: 13px; font-weight: 500; line-height: 1.4; color: var(--text-primary); margin-bottom: 6px; display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden; }
+.news-meta { font-size: 11px; color: var(--text-tertiary); }
+
+/* =====================
+   이벤트 · 응모 탭
+===================== */
+.event-list { display: flex; flex-direction: column; gap: 10px; }
+.event-card {
+  background: var(--bg-surface); border: 1px solid var(--border);
+  border-radius: var(--radius-lg); padding: 16px 18px;
+  display: flex; gap: 16px; cursor: pointer;
+  transition: all 0.15s; box-shadow: var(--shadow-sm);
+}
+.event-card:hover { border-color: var(--brand); box-shadow: var(--shadow-md); }
+.event-date-block {
+  flex-shrink: 0; width: 52px; height: 52px;
+  border-radius: var(--radius-md);
+  display: flex; flex-direction: column; align-items: center; justify-content: center;
+  background: var(--brand-subtle);
+}
+.event-date-month { font-size: 10px; font-weight: 600; color: var(--brand-text); }
+.event-date-day { font-size: 20px; font-weight: 700; color: var(--brand-text); line-height: 1; }
+.event-body { flex: 1; min-width: 0; }
+.event-tags { display: flex; gap: 5px; margin-bottom: 5px; }
+.event-tag { font-size: 10px; font-weight: 600; padding: 2px 7px; border-radius: 4px; }
+.event-tag.응모 { background: var(--pk-subtle); color: var(--pk-text); }
+.event-tag.이벤트 { background: var(--brand-subtle); color: var(--brand-text); }
+.event-tag.카드쇼 { background: #EDE9FE; color: #5B21B6; }
+.event-tag.대회 { background: #FEE2E2; color: #991B1B; }
+.event-title { font-size: 14px; font-weight: 600; color: var(--text-primary); margin-bottom: 3px; }
+.event-desc { font-size: 12px; color: var(--text-secondary); line-height: 1.5; }
+.event-right { flex-shrink: 0; text-align: right; display: flex; flex-direction: column; align-items: flex-end; gap: 6px; }
+.event-dday { font-size: 12px; font-weight: 700; padding: 3px 9px; border-radius: 20px; }
+.event-dday.soon { background: #FEE2E2; color: #991B1B; }
+.event-dday.upcoming { background: var(--brand-subtle); color: var(--brand-text); }
+.event-dday.ended { background: var(--bg-muted); color: var(--text-tertiary); }
+.event-location { font-size: 11px; color: var(--text-tertiary); }
+
+/* =====================
+   오리파 탭
+===================== */
+.oripa-grid { display: grid; grid-template-columns: repeat(3, minmax(0,1fr)); gap: 10px; }
+.oripa-card {
+  background: var(--bg-surface); border: 1px solid var(--border);
+  border-radius: var(--radius-lg); overflow: hidden;
+  cursor: pointer; transition: all 0.15s; box-shadow: var(--shadow-sm);
+}
+.oripa-card:hover { border-color: var(--brand); box-shadow: var(--shadow-md); transform: translateY(-1px); }
+.oripa-thumb {
+  width: 100%; height: 100px;
+  display: flex; align-items: center; justify-content: center;
+  font-size: 36px;
+}
+.oripa-body { padding: 12px 14px; }
+.oripa-shop { font-size: 10px; font-weight: 600; color: var(--text-tertiary); margin-bottom: 4px; }
+.oripa-title { font-size: 13px; font-weight: 600; color: var(--text-primary); margin-bottom: 6px; line-height: 1.3; }
+.oripa-info { display: flex; gap: 6px; align-items: center; flex-wrap: wrap; }
+.oripa-price { font-size: 13px; font-weight: 700; color: var(--text-primary); }
+.oripa-badge { font-size: 10px; font-weight: 600; padding: 2px 6px; border-radius: 4px; }
+.oripa-badge.pk { background: var(--pk-subtle); color: var(--pk-text); }
+.oripa-badge.op { background: var(--op-subtle); color: var(--op-text); }
+.oripa-badge.hot { background: #FEE2E2; color: #991B1B; }
+.oripa-roi { font-size: 11px; color: var(--price-up-text); font-weight: 500; margin-top: 5px; }
+
+/* =====================
+   공식 매장 · 그레이딩 탭
+===================== */
+.store-section-title { font-size: 13px; font-weight: 600; color: var(--text-primary); margin-bottom: 10px; display: flex; align-items: center; gap: 6px; }
+.store-section-title::before { content: ''; display: inline-block; width: 3px; height: 14px; background: var(--brand); border-radius: 2px; }
+.store-grid { display: grid; grid-template-columns: repeat(3, minmax(0,1fr)); gap: 10px; margin-bottom: 28px; }
+.store-card {
+  background: var(--bg-surface); border: 1px solid var(--border);
+  border-radius: var(--radius-lg); padding: 16px;
+  cursor: pointer; transition: all 0.15s; box-shadow: var(--shadow-sm);
+  display: flex; flex-direction: column; gap: 10px;
+}
+.store-card:hover { border-color: var(--brand); box-shadow: var(--shadow-md); }
+.store-icon { width: 44px; height: 44px; border-radius: var(--radius-md); display: flex; align-items: center; justify-content: center; font-size: 22px; }
+.store-info { flex: 1; }
+.store-name { font-size: 14px; font-weight: 600; color: var(--text-primary); margin-bottom: 3px; }
+.store-desc { font-size: 12px; color: var(--text-secondary); line-height: 1.5; }
+.store-tags { display: flex; gap: 5px; flex-wrap: wrap; }
+.store-tag { font-size: 10px; font-weight: 500; padding: 2px 7px; border-radius: 4px; background: var(--bg-muted); color: var(--text-secondary); }
+.store-link { font-size: 12px; font-weight: 500; color: var(--brand-text); display: flex; align-items: center; gap: 3px; }
+
+/* 그레이딩 카드 특별 스타일 */
+.grading-card {
+  background: var(--bg-surface); border: 1px solid var(--border);
+  border-radius: var(--radius-lg); padding: 16px;
+  cursor: pointer; transition: all 0.15s; box-shadow: var(--shadow-sm);
+  display: flex; gap: 14px; align-items: flex-start;
+}
+.grading-card:hover { border-color: var(--brand); box-shadow: var(--shadow-md); }
+.grading-icon-wrap { width: 48px; height: 48px; border-radius: var(--radius-md); display: flex; align-items: center; justify-content: center; font-size: 24px; flex-shrink: 0; }
+.grading-name { font-size: 14px; font-weight: 600; margin-bottom: 3px; }
+.grading-desc { font-size: 12px; color: var(--text-secondary); line-height: 1.5; margin-bottom: 6px; }
+.grading-score { font-size: 11px; font-weight: 500; padding: 2px 7px; border-radius: 4px; background: var(--bg-muted); color: var(--text-secondary); display: inline-block; }
+.grading-grid { display: grid; grid-template-columns: repeat(2, minmax(0,1fr)); gap: 10px; margin-bottom: 28px; }
+
+/* =====================
+   커뮤니티 탭
+===================== */
+.community-grid { display: grid; grid-template-columns: repeat(2, minmax(0,1fr)); gap: 10px; }
+.community-card {
+  background: var(--bg-surface); border: 1px solid var(--border);
+  border-radius: var(--radius-lg); padding: 16px 18px;
+  display: flex; gap: 14px; align-items: center;
+  cursor: pointer; transition: all 0.15s; box-shadow: var(--shadow-sm);
+}
+.community-card:hover { border-color: var(--brand); box-shadow: var(--shadow-md); }
+.community-icon { width: 48px; height: 48px; border-radius: var(--radius-md); display: flex; align-items: center; justify-content: center; font-size: 24px; flex-shrink: 0; }
+.community-body { flex: 1; min-width: 0; }
+.community-platform { font-size: 10px; font-weight: 600; color: var(--text-tertiary); margin-bottom: 3px; letter-spacing: 0.05em; }
+.community-name { font-size: 14px; font-weight: 600; color: var(--text-primary); margin-bottom: 2px; }
+.community-desc { font-size: 12px; color: var(--text-secondary); line-height: 1.4; }
+.community-meta { font-size: 11px; color: var(--text-tertiary); margin-top: 5px; }
+.community-arrow { font-size: 16px; color: var(--text-tertiary); flex-shrink: 0; }
+</style>
+</head>
+<body>
+
+<!-- TOPBAR -->
+<header class="topbar">
+  <div class="topbar-logo">
+    <div class="logo-mark">⭐</div>
+    <div><div class="logo-text">TCG Hub</div><div class="logo-sub">Pokemon · One Piece</div></div>
+  </div>
+  <div class="topbar-center">
+    <div class="search-wrap">
+      <span class="search-icon">🔍</span>
+      <input type="text" placeholder="소식 검색">
+    </div>
+  </div>
+  <div class="topbar-right">
+    <div class="btn-avatar">카</div>
+  </div>
+</header>
+
+<div class="body">
+  <!-- SIDEBAR -->
+  <aside class="sidebar">
+    <div class="nav-section">메뉴</div>
+    <div class="nav-item"><span class="nav-icon">🏠</span> 홈</div>
+    <div class="nav-item"><span class="nav-icon">📈</span> 시세</div>
+    <div class="nav-item active"><span class="nav-icon">📢</span> 소식</div>
+    <div class="nav-item"><span class="nav-icon">📚</span> 카드 도감</div>
+    <div class="nav-item"><span class="nav-icon">👤</span> 마이페이지</div>
+    <div class="nav-section">도구</div>
+    <div class="nav-item"><span class="nav-icon">📐</span> 센터링툴</div>
+    <div class="sidebar-bottom">
+      <button class="btn-install">📱 앱으로 설치</button>
+    </div>
+  </aside>
+
+  <!-- MAIN -->
+  <main class="main">
+    <div class="page-header">
+      <div class="page-title">소식</div>
+      <div class="page-desc">뉴스 · 이벤트 · 오리파 · 매장 · 커뮤니티</div>
+    </div>
+
+    <!-- 탭 -->
+    <div class="tabs">
+      <div class="tab active" onclick="switchTab(this,'news')">📰 뉴스</div>
+      <div class="tab" onclick="switchTab(this,'event')">🎪 이벤트 · 응모</div>
+      <div class="tab" onclick="switchTab(this,'oripa')">🎰 오리파</div>
+      <div class="tab" onclick="switchTab(this,'store')">🏪 공식 매장 · 그레이딩</div>
+      <div class="tab" onclick="switchTab(this,'community')">💬 커뮤니티</div>
+    </div>
+
+    <!-- 뉴스 탭 -->
+    <div class="tab-panel active" id="panel-news">
+      <!-- 메인 뉴스 -->
+      <div class="news-featured">
+        <div class="news-featured-thumb" style="background:#FEF9C3;">🎮</div>
+        <div class="news-featured-body">
+          <div class="news-featured-tag">
+            <span style="background:var(--brand-subtle);color:var(--brand-text);padding:2px 8px;border-radius:4px;font-size:10px;">최신</span>
+            뉴스
+          </div>
+          <div class="news-featured-title">포켓몬 카드 어비스아이(M5) 오늘 발매 — 뮤츠 SAR 신고가 경신 가능성</div>
+          <div class="news-featured-desc">2026년 5월 22일 출시된 어비스아이 확장팩에서 뮤츠 ex SAR 카드가 큰 관심을 받고 있어요. 발매 직후 SNKRDUNK 시세가 급등하는 패턴이 반복되고 있어 주목됩니다.</div>
+          <div class="news-featured-meta">
+            <span>2026.05.22</span>
+            <span>·</span>
+            <span style="background:var(--pk-subtle);color:var(--pk-text);padding:1px 6px;border-radius:4px;font-size:10px;font-weight:600;">POKEMON</span>
+          </div>
+        </div>
+      </div>
+
+      <div class="news-grid">
+        <div class="news-card">
+          <div class="news-card-thumb" style="background:#FEE2E2;">🏴‍☠️</div>
+          <div class="news-card-body">
+            <div class="news-tag">발매</div>
+            <div class="news-title">원피스 OP-09 로망스 던 2차 발매 일정 확정</div>
+            <div class="news-meta">2026.05.17 · <span style="background:var(--op-subtle);color:var(--op-text);padding:1px 5px;border-radius:3px;font-size:10px;font-weight:600;">ONE PIECE</span></div>
+          </div>
+        </div>
+        <div class="news-card">
+          <div class="news-card-thumb" style="background:#FEF9C3;">⚡</div>
+          <div class="news-card-body">
+            <div class="news-tag">공식 발표</div>
+            <div class="news-title">포켓몬 카드 게임 제품 가격 조정 안내 — 2026년 하반기 적용</div>
+            <div class="news-meta">2026.04.30 · <span style="background:var(--pk-subtle);color:var(--pk-text);padding:1px 5px;border-radius:3px;font-size:10px;font-weight:600;">POKEMON</span></div>
+          </div>
+        </div>
+        <div class="news-card">
+          <div class="news-card-thumb" style="background:#E8FAFA;">📊</div>
+          <div class="news-card-body">
+            <div class="news-tag">시세 분석</div>
+            <div class="news-title">이번 주 급등 카드 TOP 5 — SAR 카드군 강세 지속</div>
+            <div class="news-meta">2026.05.16</div>
+          </div>
+        </div>
+        <div class="news-card">
+          <div class="news-card-thumb" style="background:#EDE9FE;">🎮</div>
+          <div class="news-card-body">
+            <div class="news-tag">이벤트</div>
+            <div class="news-title">[배틀로그 코치룸] 영상 응모로 포켓몬스쿨 보내주세요</div>
+            <div class="news-meta">2026.04.20 · <span style="background:var(--pk-subtle);color:var(--pk-text);padding:1px 5px;border-radius:3px;font-size:10px;font-weight:600;">POKEMON</span></div>
+          </div>
+        </div>
+        <div class="news-card">
+          <div class="news-card-thumb" style="background:#FEE2E2;">⚔️</div>
+          <div class="news-card-body">
+            <div class="news-tag">대회</div>
+            <div class="news-title">포켓몬스쿨 in 포켓몬코리아 리뉴얼 OPEN!</div>
+            <div class="news-meta">2026.04.17 · <span style="background:var(--pk-subtle);color:var(--pk-text);padding:1px 5px;border-radius:3px;font-size:10px;font-weight:600;">POKEMON</span></div>
+          </div>
+        </div>
+        <div class="news-card">
+          <div class="news-card-thumb" style="background:#FEF9C3;">🃏</div>
+          <div class="news-card-body">
+            <div class="news-tag">발매</div>
+            <div class="news-title">MEGA 스페셜 키트 「닌자스피너」 5월 대발매!</div>
+            <div class="news-meta">2026.04.15 · <span style="background:var(--pk-subtle);color:var(--pk-text);padding:1px 5px;border-radius:3px;font-size:10px;font-weight:600;">POKEMON</span></div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- 이벤트 · 응모 탭 -->
+    <div class="tab-panel" id="panel-event">
+      <div class="event-list">
+        <div class="event-card">
+          <div class="event-date-block">
+            <div class="event-date-month">MAY</div>
+            <div class="event-date-day">22</div>
+          </div>
+          <div class="event-body">
+            <div class="event-tags"><span class="event-tag 응모">응모</span></div>
+            <div class="event-title">포켓몬 어비스아이 현장 사전 추첨</div>
+            <div class="event-desc">포켓몬센터 전국 매장에서 현장 사전 추첨 진행. 1인 1매 제한, 당일 오전 10시부터 번호표 배부.</div>
+          </div>
+          <div class="event-right">
+            <span class="event-dday soon">D-Day</span>
+            <span class="event-location">📍 포켓몬센터 전국</span>
+          </div>
+        </div>
+        <div class="event-card">
+          <div class="event-date-block">
+            <div class="event-date-month">MAY</div>
+            <div class="event-date-day">26</div>
+          </div>
+          <div class="event-body">
+            <div class="event-tags"><span class="event-tag 이벤트">이벤트</span></div>
+            <div class="event-title">일산 킨텍스 원피스 이모션 프로모 배포</div>
+            <div class="event-desc">킨텍스 행사장에서 원피스 카드게임 한정 프로모 카드 배포. 선착순 500명.</div>
+          </div>
+          <div class="event-right">
+            <span class="event-dday upcoming">D-4</span>
+            <span class="event-location">📍 일산 킨텍스</span>
+          </div>
+        </div>
+        <div class="event-card">
+          <div class="event-date-block">
+            <div class="event-date-month">JUN</div>
+            <div class="event-date-day">7</div>
+          </div>
+          <div class="event-body">
+            <div class="event-tags"><span class="event-tag 카드쇼">카드쇼</span></div>
+            <div class="event-title">2026 서울 카드쇼 — 개인 부스 참가 신청</div>
+            <div class="event-desc">국내 최대 규모 TCG 카드쇼. 포켓몬, 원피스, 유희왕 등 전 TCG 브랜드 참가. 개인 부스 신청 마감 5/31.</div>
+          </div>
+          <div class="event-right">
+            <span class="event-dday upcoming">D-16</span>
+            <span class="event-location">📍 코엑스 A홀</span>
+          </div>
+        </div>
+        <div class="event-card">
+          <div class="event-date-block" style="background:var(--bg-muted);">
+            <div class="event-date-month" style="color:var(--text-tertiary);">MAY</div>
+            <div class="event-date-day" style="color:var(--text-tertiary);">19</div>
+          </div>
+          <div class="event-body">
+            <div class="event-tags"><span class="event-tag 응모">응모</span></div>
+            <div class="event-title">PSA + Bandai ONE PIECE 구독자 카드 배포</div>
+            <div class="event-desc">PSA 공식 구독자 대상 원피스 한정 카드 배포 이벤트 종료.</div>
+          </div>
+          <div class="event-right">
+            <span class="event-dday ended">종료</span>
+            <span class="event-location">📍 온라인</span>
+          </div>
+        </div>
+        <div class="event-card">
+          <div class="event-date-block" style="background:var(--bg-muted);">
+            <div class="event-date-month" style="color:var(--text-tertiary);">MAY</div>
+            <div class="event-date-day" style="color:var(--text-tertiary);">16</div>
+          </div>
+          <div class="event-body">
+            <div class="event-tags"><span class="event-tag 대회">대회</span></div>
+            <div class="event-title">포켓몬 카드 게임 비기너 챌린지 개최</div>
+            <div class="event-desc">초보자를 위한 포켓몬 카드 대회. 입상자 한정 프로모 카드 증정.</div>
+          </div>
+          <div class="event-right">
+            <span class="event-dday ended">종료</span>
+            <span class="event-location">📍 포켓몬센터 서울</span>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- 오리파 탭 -->
+    <div class="tab-panel" id="panel-oripa">
+      <div style="background:var(--bg-surface);border:1px solid var(--border);border-radius:var(--radius-lg);padding:12px 16px;margin-bottom:16px;display:flex;align-items:center;gap:10px;">
+        <span style="font-size:16px;">🎰</span>
+        <div style="font-size:12px;color:var(--text-secondary);line-height:1.5;flex:1;">
+          <strong style="color:var(--text-primary);">오리파(オリパ)란?</strong> 원하는 카드를 뽑을 수 있는 복권형 카드 판매 방식이에요. 가격 대비 고등급 카드를 얻을 수 있지만, 결과는 랜덤입니다.
+        </div>
+      </div>
+      <div class="oripa-grid">
+        <div class="oripa-card">
+          <div class="oripa-thumb" style="background:linear-gradient(135deg,#FEF9C3,#FFD700);">🎯</div>
+          <div class="oripa-body">
+            <div class="oripa-shop">포켓몬샵 서울</div>
+            <div class="oripa-title">SAR 확정 포켓몬 오리파 5월호</div>
+            <div class="oripa-info">
+              <span class="oripa-price">₩15,000 / 1매</span>
+              <span class="oripa-badge pk">PK</span>
+              <span class="oripa-badge hot">🔥 인기</span>
+            </div>
+            <div class="oripa-roi">수익률 분석 → 평균 +24%</div>
+          </div>
+        </div>
+        <div class="oripa-card">
+          <div class="oripa-thumb" style="background:linear-gradient(135deg,#FEE2E2,#CC2244);">☠️</div>
+          <div class="oripa-body">
+            <div class="oripa-shop">카드킹덤 온라인</div>
+            <div class="oripa-title">원피스 SP 보장 오리파 — 조로 에디션</div>
+            <div class="oripa-info">
+              <span class="oripa-price">₩25,000 / 1매</span>
+              <span class="oripa-badge op">OP</span>
+            </div>
+            <div class="oripa-roi">수익률 분석 → 평균 +18%</div>
+          </div>
+        </div>
+        <div class="oripa-card">
+          <div class="oripa-thumb" style="background:linear-gradient(135deg,#EDE9FE,#7C3AED);">✨</div>
+          <div class="oripa-body">
+            <div class="oripa-shop">TCG마켓</div>
+            <div class="oripa-title">혼합 프리미엄 오리파 — SAR·SP 보장</div>
+            <div class="oripa-info">
+              <span class="oripa-price">₩30,000 / 1매</span>
+              <span class="oripa-badge pk">PK</span>
+              <span class="oripa-badge op">OP</span>
+            </div>
+            <div class="oripa-roi">수익률 분석 → 평균 +31%</div>
+          </div>
+        </div>
+        <div class="oripa-card">
+          <div class="oripa-thumb" style="background:linear-gradient(135deg,#FEF9C3,#FFD700);">🃏</div>
+          <div class="oripa-body">
+            <div class="oripa-shop">포켓몬 전문점 부산</div>
+            <div class="oripa-title">어비스아이 M5 오리파 — 신상</div>
+            <div class="oripa-info">
+              <span class="oripa-price">₩10,000 / 1매</span>
+              <span class="oripa-badge pk">PK</span>
+              <span class="oripa-badge hot">🆕 신규</span>
+            </div>
+            <div class="oripa-roi">수익률 분석 → 집계 중</div>
+          </div>
+        </div>
+        <div class="oripa-card">
+          <div class="oripa-thumb" style="background:linear-gradient(135deg,#FEE2E2,#CC2244);">🏴‍☠️</div>
+          <div class="oripa-body">
+            <div class="oripa-shop">원피스카드샵</div>
+            <div class="oripa-title">로망스 던 OP-01 레전드 오리파</div>
+            <div class="oripa-info">
+              <span class="oripa-price">₩20,000 / 1매</span>
+              <span class="oripa-badge op">OP</span>
+            </div>
+            <div class="oripa-roi">수익률 분석 → 평균 +12%</div>
+          </div>
+        </div>
+        <div class="oripa-card">
+          <div class="oripa-thumb" style="background:linear-gradient(135deg,#E8FAFA,#19DFDF);">💫</div>
+          <div class="oripa-body">
+            <div class="oripa-shop">카드마켓 온라인</div>
+            <div class="oripa-title">5월 수익률 1위 오리파 — 분석 완료</div>
+            <div class="oripa-info">
+              <span class="oripa-price">₩18,000 / 1매</span>
+              <span class="oripa-badge pk">PK</span>
+              <span class="oripa-badge op">OP</span>
+            </div>
+            <div class="oripa-roi">수익률 분석 → 평균 +42%</div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- 공식 매장 · 그레이딩 탭 -->
+    <div class="tab-panel" id="panel-store">
+      <div class="store-section-title">공식 매장</div>
+      <div class="store-grid">
+        <div class="store-card">
+          <div class="store-icon" style="background:var(--pk-subtle);">🏪</div>
+          <div class="store-info">
+            <div class="store-name">포켓몬센터 코리아</div>
+            <div class="store-desc">국내 공식 포켓몬 카드 판매처. 서울·부산·대구 매장 운영.</div>
+          </div>
+          <div class="store-tags">
+            <span class="store-tag">공식</span>
+            <span class="store-tag">오프라인</span>
+            <span class="store-tag">온라인</span>
+          </div>
+          <div class="store-link">사이트 방문 ↗</div>
+        </div>
+        <div class="store-card">
+          <div class="store-icon" style="background:var(--op-subtle);">🏬</div>
+          <div class="store-info">
+            <div class="store-name">반다이 공식몰</div>
+            <div class="store-desc">원피스 카드게임 공식 판매처. 예약 판매 및 한정 상품 취급.</div>
+          </div>
+          <div class="store-tags">
+            <span class="store-tag">공식</span>
+            <span class="store-tag">온라인</span>
+            <span class="store-tag">예약판매</span>
+          </div>
+          <div class="store-link">사이트 방문 ↗</div>
+        </div>
+        <div class="store-card">
+          <div class="store-icon" style="background:var(--brand-subtle);">🛒</div>
+          <div class="store-info">
+            <div class="store-name">SNKRDUNK</div>
+            <div class="store-desc">일본 최대 TCG 리셀 플랫폼. 실거래가 기반 구매/판매 가능.</div>
+          </div>
+          <div class="store-tags">
+            <span class="store-tag">리셀</span>
+            <span class="store-tag">일본</span>
+            <span class="store-tag">실거래가</span>
+          </div>
+          <div class="store-link">사이트 방문 ↗</div>
+        </div>
+      </div>
+
+      <div class="store-section-title">그레이딩 업체</div>
+      <div class="grading-grid">
+        <div class="grading-card">
+          <div class="grading-icon-wrap" style="background:#FEF9C3;">🏆</div>
+          <div>
+            <div class="grading-name">PSA (Professional Sports Authenticator)</div>
+            <div class="grading-desc">세계 최대·최고 공신력의 카드 그레이딩 기관. PSA 10 등급은 시세를 2~5배 높여줘요.</div>
+            <span class="grading-score">등급: 1 ~ 10</span>
+          </div>
+        </div>
+        <div class="grading-card">
+          <div class="grading-icon-wrap" style="background:#E8F4FD;">🥈</div>
+          <div>
+            <div class="grading-name">BGS (Beckett Grading Services)</div>
+            <div class="grading-desc">PSA와 함께 양대 그레이딩 기관. 서브그레이드 제공으로 더 세밀한 평가.</div>
+            <span class="grading-score">등급: 1 ~ 10 (0.5 단위)</span>
+          </div>
+        </div>
+        <div class="grading-card">
+          <div class="grading-icon-wrap" style="background:#DCFCE7;">🇰🇷</div>
+          <div>
+            <div class="grading-name">KCG (Korea Card Grading)</div>
+            <div class="grading-desc">국내 카드 그레이딩 서비스. 빠른 턴어라운드와 한국어 서비스 제공.</div>
+            <span class="grading-score">등급: 1 ~ 10</span>
+          </div>
+        </div>
+        <div class="grading-card">
+          <div class="grading-icon-wrap" style="background:#FEE2E2;">🤖</div>
+          <div>
+            <div class="grading-name">TCG Hub AI 센터링툴</div>
+            <div class="grading-desc">그레이딩 전 자가진단 도구. 앞/뒷면 사진으로 센터링 점수를 AI가 예측해줘요.</div>
+            <span class="grading-score" style="background:var(--brand-subtle);color:var(--brand-text);">일 3회 무료</span>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- 커뮤니티 탭 -->
+    <div class="tab-panel" id="panel-community">
+      <div class="community-grid">
+        <div class="community-card">
+          <div class="community-icon" style="background:#FFE0E0;">▶️</div>
+          <div class="community-body">
+            <div class="community-platform">YOUTUBE</div>
+            <div class="community-name">포켓몬카드TV</div>
+            <div class="community-desc">국내 최대 포켓몬 카드 전문 유튜브. 시세 분석, 오리파 개봉기 정기 업로드.</div>
+            <div class="community-meta">구독자 24만명 · 주 3회 업로드</div>
+          </div>
+          <div class="community-arrow">↗</div>
+        </div>
+        <div class="community-card">
+          <div class="community-icon" style="background:#FFE0E0;">▶️</div>
+          <div class="community-body">
+            <div class="community-platform">YOUTUBE</div>
+            <div class="community-name">원피스카드채널</div>
+            <div class="community-desc">원피스 카드게임 전문 채널. 최신 팩 개봉기, 덱 가이드, 대회 정보 제공.</div>
+            <div class="community-meta">구독자 8만명 · 주 2회 업로드</div>
+          </div>
+          <div class="community-arrow">↗</div>
+        </div>
+        <div class="community-card">
+          <div class="community-icon" style="background:#E8F4FF;">☕</div>
+          <div class="community-body">
+            <div class="community-platform">NAVER CAFE</div>
+            <div class="community-name">포켓몬카드 한국 공식 카페</div>
+            <div class="community-desc">국내 최대 포켓몬 카드 커뮤니티. 시세 정보, 매매글, 이벤트 정보 공유.</div>
+            <div class="community-meta">회원 38만명 · 일 평균 200+ 게시글</div>
+          </div>
+          <div class="community-arrow">↗</div>
+        </div>
+        <div class="community-card">
+          <div class="community-icon" style="background:#E8F4FF;">☕</div>
+          <div class="community-body">
+            <div class="community-platform">NAVER CAFE</div>
+            <div class="community-name">원피스 카드게임 코리아</div>
+            <div class="community-desc">원피스 카드 국내 커뮤니티. 덱 레시피, 대회 결과, 카드 매매 정보.</div>
+            <div class="community-meta">회원 12만명 · 일 평균 80+ 게시글</div>
+          </div>
+          <div class="community-arrow">↗</div>
+        </div>
+        <div class="community-card">
+          <div class="community-icon" style="background:#E8FFE8;">💬</div>
+          <div class="community-body">
+            <div class="community-platform">DISCORD</div>
+            <div class="community-name">TCG Korea 공식 디스코드</div>
+            <div class="community-desc">실시간 시세 공유, 오리파 후기, 카드 교환 채널 운영.</div>
+            <div class="community-meta">멤버 1.2만명 · 24시간 활성</div>
+          </div>
+          <div class="community-arrow">↗</div>
+        </div>
+        <div class="community-card">
+          <div class="community-icon" style="background:#FFF3E0;">📱</div>
+          <div class="community-body">
+            <div class="community-platform">INSTAGRAM</div>
+            <div class="community-name">@tcghub_korea</div>
+            <div class="community-desc">TCG Hub 공식 인스타그램. 시세 인포그래픽, 신규 발매 알림.</div>
+            <div class="community-meta">팔로워 4,200명 · 주 5회 업로드</div>
+          </div>
+          <div class="community-arrow">↗</div>
+        </div>
+      </div>
+    </div>
+
+  </main>
+</div>
+
+<script>
+function switchTab(tab, panelId) {
+  document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
+  document.querySelectorAll('.tab-panel').forEach(p => p.classList.remove('active'));
+  tab.classList.add('active');
+  document.getElementById('panel-' + panelId).classList.add('active');
+}
+</script>
+</body>
+</html>

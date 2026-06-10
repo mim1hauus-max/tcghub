@@ -1,0 +1,695 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>TCG Hub — 시세</title>
+<link href="https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+:root {
+  --brand: #19DFDF;
+  --brand-hover: #0FB8B8;
+  --brand-subtle: #E8FAFA;
+  --brand-text: #066666;
+  --price-up: #16A34A;
+  --price-up-subtle: #DCFCE7;
+  --price-up-text: #166534;
+  --price-down: #DC2626;
+  --price-down-subtle: #FEE2E2;
+  --price-down-text: #991B1B;
+  --pk: #D4A800;
+  --pk-subtle: #FEF9C3;
+  --pk-text: #7a5c00;
+  --op: #CC2244;
+  --op-subtle: #FEE2E2;
+  --op-text: #991B1B;
+  --bg-page: #F7F6F2;
+  --bg-surface: #FFFFFF;
+  --bg-muted: #EDECE8;
+  --border: #D9D8D3;
+  --border-subtle: #EDECE8;
+  --text-primary: #0D0D0D;
+  --text-secondary: #666560;
+  --text-tertiary: #999894;
+  --radius-sm: 6px;
+  --radius-md: 10px;
+  --radius-lg: 14px;
+  --shadow-sm: 0 1px 3px rgba(0,0,0,0.06);
+  --shadow-md: 0 4px 16px rgba(0,0,0,0.1);
+  --font: 'Noto Sans KR', sans-serif;
+  --sidebar-w: 200px;
+  --topbar-h: 52px;
+}
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+body { font-family: var(--font); background: var(--bg-page); color: var(--text-primary); font-size: 14px; line-height: 1.5; -webkit-font-smoothing: antialiased; }
+button { border: none; background: none; cursor: pointer; font-family: var(--font); }
+
+/* TOPBAR */
+.topbar {
+  position: fixed; top: 0; left: 0; right: 0; z-index: 100;
+  height: var(--topbar-h); background: var(--bg-surface);
+  border-bottom: 1px solid var(--border-subtle);
+  display: flex; align-items: center;
+}
+.topbar-logo {
+  width: var(--sidebar-w); flex-shrink: 0;
+  display: flex; align-items: center; gap: 8px;
+  padding: 0 20px; height: 100%;
+  border-right: 1px solid var(--border-subtle);
+}
+.logo-mark { width: 28px; height: 28px; border-radius: 8px; background: var(--brand); display: flex; align-items: center; justify-content: center; font-size: 14px; }
+.logo-text { font-size: 15px; font-weight: 700; letter-spacing: -0.01em; }
+.logo-sub { font-size: 10px; color: var(--text-tertiary); margin-top: 1px; }
+.topbar-center { flex: 1; padding: 0 20px; }
+.search-wrap { position: relative; width: 320px; }
+.search-wrap input { width: 100%; height: 34px; background: var(--bg-page); border: 1px solid var(--border); border-radius: 20px; padding: 0 12px 0 34px; font-size: 13px; font-family: var(--font); color: var(--text-primary); outline: none; transition: border-color 0.15s; }
+.search-wrap input:focus { border-color: var(--brand); }
+.search-wrap input::placeholder { color: var(--text-tertiary); }
+.search-icon { position: absolute; left: 11px; top: 50%; transform: translateY(-50%); color: var(--text-tertiary); font-size: 13px; }
+.topbar-right { display: flex; align-items: center; gap: 10px; padding-right: 20px; }
+.snkr-help { display: flex; align-items: center; gap: 5px; font-size: 12px; color: var(--text-tertiary); padding: 5px 10px; border-radius: 20px; border: 1px solid var(--border); cursor: pointer; transition: all 0.12s; }
+.snkr-help:hover { border-color: var(--brand); color: var(--brand-text); }
+.btn-avatar { width: 32px; height: 32px; border-radius: 50%; background: var(--brand-subtle); color: var(--brand-text); font-size: 12px; font-weight: 600; display: flex; align-items: center; justify-content: center; border: 1.5px solid var(--brand); cursor: pointer; }
+
+/* LAYOUT */
+.body { display: flex; padding-top: var(--topbar-h); min-height: 100vh; }
+.sidebar { width: var(--sidebar-w); position: fixed; top: var(--topbar-h); left: 0; bottom: 0; background: var(--bg-surface); border-right: 1px solid var(--border-subtle); padding: 16px 12px; display: flex; flex-direction: column; overflow-y: auto; z-index: 50; }
+.nav-section { font-size: 10px; font-weight: 500; color: var(--text-tertiary); letter-spacing: 0.07em; padding: 0 8px; margin-bottom: 6px; margin-top: 16px; }
+.nav-section:first-child { margin-top: 0; }
+.nav-item { display: flex; align-items: center; gap: 9px; padding: 8px 10px; border-radius: var(--radius-md); font-size: 13px; color: var(--text-secondary); cursor: pointer; transition: all 0.12s; margin-bottom: 1px; }
+.nav-item:hover { background: var(--bg-page); color: var(--text-primary); }
+.nav-item.active { background: var(--brand-subtle); color: var(--brand-text); font-weight: 600; }
+.nav-icon { font-size: 15px; width: 18px; text-align: center; flex-shrink: 0; }
+.nav-brand-badge { font-size: 10px; font-weight: 600; padding: 2px 8px; border-radius: 4px; }
+.nav-brand-badge.pk { background: var(--pk-subtle); color: var(--pk-text); }
+.nav-brand-badge.op { background: var(--op-subtle); color: var(--op-text); }
+.sidebar-bottom { margin-top: auto; padding-top: 12px; border-top: 1px solid var(--border-subtle); }
+.btn-install { width: 100%; padding: 8px 10px; border: 1px solid var(--border); border-radius: var(--radius-md); font-size: 12px; color: var(--text-secondary); background: transparent; text-align: left; cursor: pointer; }
+
+.main { margin-left: var(--sidebar-w); flex: 1; padding: 24px; }
+
+/* PAGE HEADER */
+.page-header { margin-bottom: 20px; }
+.page-title { font-size: 22px; font-weight: 700; letter-spacing: -0.02em; margin-bottom: 4px; }
+.page-desc { font-size: 13px; color: var(--text-secondary); display: flex; align-items: center; gap: 6px; }
+.live-dot { width: 6px; height: 6px; border-radius: 50%; background: var(--price-up); display: inline-block; animation: pulse 1.5s infinite; }
+@keyframes pulse { 0%,100%{opacity:1;} 50%{opacity:0.4;} }
+
+/* BRAND TABS */
+.brand-tabs { display: flex; gap: 4px; margin-bottom: 16px; border-bottom: 1px solid var(--border-subtle); }
+.brand-tab { padding: 10px 16px; font-size: 13px; font-weight: 500; color: var(--text-tertiary); cursor: pointer; border-bottom: 2px solid transparent; margin-bottom: -1px; transition: all 0.12s; display: flex; align-items: center; gap: 6px; }
+.brand-tab:hover { color: var(--text-primary); }
+.brand-tab.active-pk { color: var(--pk-text); border-bottom-color: var(--pk); font-weight: 600; }
+.brand-tab.active-op { color: var(--op-text); border-bottom-color: var(--op); font-weight: 600; }
+
+/* TYPE TABS */
+.type-tabs { display: flex; gap: 6px; margin-bottom: 14px; }
+.type-tab { padding: 6px 14px; font-size: 12px; font-weight: 500; border-radius: 20px; border: 1px solid var(--border); color: var(--text-secondary); cursor: pointer; transition: all 0.12s; background: transparent; font-family: var(--font); }
+.type-tab:hover { border-color: var(--brand); color: var(--brand-text); }
+.type-tab.active { background: var(--text-primary); color: white; border-color: var(--text-primary); }
+
+/* FILTER BAR */
+.filter-bar {
+  background: var(--bg-surface); border: 1px solid var(--border);
+  border-radius: var(--radius-lg); padding: 12px 16px;
+  display: flex; align-items: center; gap: 8px; flex-wrap: wrap;
+  margin-bottom: 16px; box-shadow: var(--shadow-sm);
+}
+.filter-group { display: flex; align-items: center; gap: 6px; }
+.filter-group-label { font-size: 11px; color: var(--text-tertiary); font-weight: 500; white-space: nowrap; }
+.filter-chip { font-size: 12px; padding: 4px 11px; border-radius: 20px; border: 1px solid var(--border); color: var(--text-secondary); cursor: pointer; transition: all 0.12s; white-space: nowrap; background: transparent; font-family: var(--font); }
+.filter-chip:hover { border-color: var(--brand); color: var(--brand-text); }
+.filter-chip.active { background: var(--brand-subtle); border-color: var(--brand); color: var(--brand-text); font-weight: 500; }
+.filter-divider { width: 1px; height: 20px; background: var(--border); flex-shrink: 0; }
+.filter-count { font-size: 11px; color: var(--text-tertiary); margin-left: auto; white-space: nowrap; }
+.filter-reset { font-size: 11px; color: var(--text-tertiary); cursor: pointer; padding: 4px 8px; border-radius: var(--radius-sm); transition: all 0.12s; white-space: nowrap; }
+.filter-reset:hover { background: var(--bg-page); color: var(--text-secondary); }
+
+/* SELECT */
+.filter-select { font-size: 12px; padding: 4px 28px 4px 10px; border-radius: 20px; border: 1px solid var(--border); color: var(--text-secondary); cursor: pointer; background: transparent; font-family: var(--font); appearance: none; -webkit-appearance: none; background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='10' height='6'%3E%3Cpath d='M0 0l5 6 5-6z' fill='%23999'/%3E%3C/svg%3E"); background-repeat: no-repeat; background-position: right 10px center; outline: none; }
+.filter-select:focus { border-color: var(--brand); }
+
+/* RESULTS INFO */
+.results-info { display: flex; align-items: center; justify-content: space-between; margin-bottom: 12px; }
+.results-count { font-size: 12px; color: var(--text-tertiary); }
+.results-count strong { color: var(--text-primary); font-weight: 600; }
+.results-sort { display: flex; align-items: center; gap: 6px; font-size: 12px; color: var(--text-tertiary); }
+
+/* CARD GRID */
+.card-grid { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 10px; }
+.price-card {
+  background: var(--bg-surface); border: 1px solid var(--border);
+  border-radius: var(--radius-lg); padding: 14px;
+  cursor: pointer; transition: all 0.15s; box-shadow: var(--shadow-sm);
+  position: relative;
+}
+.price-card:hover { border-color: var(--brand); box-shadow: var(--shadow-md), 0 0 0 3px rgba(25,223,223,0.06); transform: translateY(-1px); }
+.card-img-wrap {
+  width: 100%; aspect-ratio: 3/4;
+  border-radius: var(--radius-md); margin-bottom: 10px;
+  display: flex; align-items: center; justify-content: center;
+  font-size: 40px; overflow: hidden;
+}
+.card-img-wrap.pk-bg { background: linear-gradient(135deg, #FEF9C3 0%, #FFE066 100%); }
+.card-img-wrap.op-bg { background: linear-gradient(135deg, #FEE2E2 0%, #FF8899 100%); }
+.card-top { display: flex; align-items: flex-start; justify-content: space-between; gap: 6px; margin-bottom: 6px; }
+.card-name { font-size: 13px; font-weight: 600; color: var(--text-primary); line-height: 1.3; flex: 1; }
+.card-name-en { font-size: 10px; color: var(--text-tertiary); margin-top: 1px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.card-badge { font-size: 10px; font-weight: 600; padding: 2px 6px; border-radius: 4px; flex-shrink: 0; }
+.card-badge.pk { background: var(--pk-subtle); color: var(--pk-text); }
+.card-badge.op { background: var(--op-subtle); color: var(--op-text); }
+.card-pack { font-size: 11px; color: var(--text-tertiary); margin-bottom: 8px; }
+.mini-chart { display: none; }
+.mini-bar { display: none; }
+.card-price-row { display: flex; align-items: flex-end; justify-content: space-between; }
+.card-price { font-size: 16px; font-weight: 700; color: var(--text-primary); letter-spacing: -0.01em; }
+.card-price-sub { font-size: 10px; color: var(--text-tertiary); margin-top: 1px; }
+.card-change { font-size: 11px; font-weight: 600; padding: 3px 7px; border-radius: 6px; }
+.card-change.up { background: var(--price-up-subtle); color: var(--price-up-text); }
+.card-change.down { background: var(--price-down-subtle); color: var(--price-down-text); }
+.card-fav { position: absolute; top: 10px; right: 10px; font-size: 14px; opacity: 0; transition: opacity 0.12s; cursor: pointer; }
+.price-card:hover .card-fav { opacity: 1; }
+
+/* DETAIL PANEL */
+.detail-overlay { display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.35); z-index: 300; }
+.detail-overlay.show { display: block; }
+.detail-panel {
+  position: fixed; top: 0; right: -560px; bottom: 0; width: 540px;
+  background: var(--bg-surface); z-index: 301;
+  box-shadow: -4px 0 40px rgba(0,0,0,0.12);
+  overflow-y: auto;
+  transition: right 0.3s cubic-bezier(0.4,0,0.2,1);
+  display: flex; flex-direction: column;
+}
+.detail-panel.show { right: 0; }
+.detail-header {
+  padding: 20px 20px 16px;
+  border-bottom: 1px solid var(--border-subtle);
+  display: flex; align-items: flex-start; gap: 14px;
+  position: sticky; top: 0; background: var(--bg-surface); z-index: 1;
+}
+.detail-card-img {
+  width: 70px; height: 98px; border-radius: var(--radius-md);
+  display: flex; align-items: center; justify-content: center;
+  font-size: 36px; flex-shrink: 0;
+}
+.detail-info { flex: 1; min-width: 0; }
+.detail-badge { font-size: 10px; font-weight: 600; padding: 2px 7px; border-radius: 4px; display: inline-block; margin-bottom: 5px; }
+.detail-badge.pk { background: var(--pk-subtle); color: var(--pk-text); }
+.detail-badge.op { background: var(--op-subtle); color: var(--op-text); }
+.detail-name { font-size: 16px; font-weight: 700; margin-bottom: 2px; line-height: 1.3; }
+.detail-name-en { font-size: 11px; color: var(--text-tertiary); margin-bottom: 8px; }
+.detail-pack { font-size: 12px; color: var(--text-secondary); }
+.detail-close { font-size: 20px; color: var(--text-tertiary); cursor: pointer; }
+.detail-close:hover { color: var(--text-primary); }
+.detail-expand {
+  font-size: 16px; color: var(--text-tertiary); cursor: pointer;
+  width: 28px; height: 28px; border-radius: var(--radius-sm);
+  border: 1px solid var(--border); display: flex; align-items: center;
+  justify-content: center; transition: all 0.12s;
+}
+.detail-expand:hover { border-color: var(--brand); color: var(--brand-text); background: var(--brand-subtle); }
+
+/* 확장 모드 */
+.detail-panel.expanded {
+  width: 100% !important;
+  right: 0 !important;
+  border-radius: 0;
+}
+.detail-panel.expanded .detail-body {
+  display: grid;
+  grid-template-columns: 340px 1fr;
+  gap: 32px;
+  max-width: 1100px;
+  margin: 0 auto;
+}
+.detail-panel.expanded .detail-header {
+  max-width: 1100px;
+  margin: 0 auto;
+  width: 100%;
+}
+
+.detail-body { padding: 20px; flex: 1; }
+
+/* 현재 시세 박스 */
+.current-price-box {
+  background: var(--bg-page); border-radius: var(--radius-lg);
+  padding: 16px 18px; margin-bottom: 16px;
+}
+.cpb-label { font-size: 11px; font-weight: 600; color: var(--brand-text); letter-spacing: 0.05em; margin-bottom: 6px; display: flex; align-items: center; gap: 6px; }
+.cpb-label-tip { font-size: 10px; font-weight: 400; color: var(--text-tertiary); letter-spacing: 0; }
+.cpb-price { font-size: 28px; font-weight: 700; letter-spacing: -0.02em; color: var(--text-primary); margin-bottom: 3px; }
+.cpb-usd { font-size: 13px; color: var(--text-tertiary); margin-bottom: 10px; }
+.cpb-row { display: flex; gap: 10px; }
+.cpb-stat { flex: 1; background: var(--bg-surface); border-radius: var(--radius-md); padding: 10px 12px; }
+.cpb-stat-label { font-size: 10px; color: var(--text-tertiary); margin-bottom: 3px; }
+.cpb-stat-val { font-size: 14px; font-weight: 600; }
+.cpb-stat-val.up { color: var(--price-up); }
+.cpb-stat-val.down { color: var(--price-down); }
+
+/* 차트 영역 */
+.chart-section { margin-bottom: 16px; }
+.chart-header { display: flex; align-items: center; justify-content: space-between; margin-bottom: 10px; }
+.chart-title { font-size: 13px; font-weight: 600; }
+.chart-period { display: flex; gap: 4px; }
+.period-btn { font-size: 11px; padding: 3px 9px; border-radius: 6px; border: 1px solid var(--border); color: var(--text-tertiary); cursor: pointer; font-family: var(--font); background: transparent; transition: all 0.12s; }
+.period-btn:hover { border-color: var(--brand); color: var(--brand-text); }
+.period-btn.active { background: var(--text-primary); color: white; border-color: var(--text-primary); }
+
+/* SVG 차트 */
+.chart-wrap { background: var(--bg-page); border-radius: var(--radius-lg); padding: 12px; }
+.chart-wrap svg { display: block; width: 100%; }
+
+/* 액션 버튼 */
+.action-row { display: flex; gap: 8px; margin-bottom: 16px; }
+.btn-primary { flex: 1; padding: 11px; border-radius: var(--radius-md); background: var(--text-primary); color: white; font-size: 13px; font-weight: 600; cursor: pointer; transition: all 0.12s; font-family: var(--font); }
+.btn-primary:hover { background: #333; }
+.btn-secondary { flex: 1; padding: 11px; border-radius: var(--radius-md); border: 1px solid var(--border); background: transparent; color: var(--text-primary); font-size: 13px; font-weight: 500; cursor: pointer; transition: all 0.12s; font-family: var(--font); display: flex; align-items: center; justify-content: center; gap: 6px; }
+.btn-secondary:hover { border-color: var(--brand); color: var(--brand-text); }
+
+/* 거래 정보 테이블 */
+.info-table { width: 100%; border-collapse: collapse; }
+.info-table tr { border-bottom: 1px solid var(--border-subtle); }
+.info-table tr:last-child { border-bottom: none; }
+.info-table td { padding: 9px 0; font-size: 13px; }
+.info-table td:first-child { color: var(--text-tertiary); width: 120px; }
+.info-table td:last-child { font-weight: 500; text-align: right; }
+
+/* SNKRDUNK MODAL */
+.modal-overlay { display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.3); z-index: 400; align-items: center; justify-content: center; }
+.modal-overlay.show { display: flex; }
+.modal { background: var(--bg-surface); border-radius: var(--radius-lg); padding: 24px; max-width: 420px; width: 90%; box-shadow: 0 20px 60px rgba(0,0,0,0.15); }
+.modal-header { display: flex; align-items: center; justify-content: space-between; margin-bottom: 14px; }
+.modal-title { font-size: 15px; font-weight: 700; }
+.modal-close { font-size: 18px; color: var(--text-tertiary); cursor: pointer; }
+.modal-body { font-size: 13px; color: var(--text-secondary); line-height: 1.7; }
+.modal-body strong { color: var(--text-primary); font-weight: 600; }
+.modal-tag { display: inline-block; margin-top: 12px; font-size: 11px; font-weight: 600; padding: 3px 10px; border-radius: 20px; background: var(--brand-subtle); color: var(--brand-text); }
+</style>
+</head>
+<body>
+
+<!-- TOPBAR -->
+<header class="topbar">
+  <div class="topbar-logo">
+    <div class="logo-mark">⭐</div>
+    <div><div class="logo-text">TCG Hub</div><div class="logo-sub">Pokemon · One Piece</div></div>
+  </div>
+  <div class="topbar-center">
+    <div class="search-wrap">
+      <span class="search-icon">🔍</span>
+      <input type="text" placeholder="카드 검색 (예: 리자몽, 루피, SAR, M5)">
+    </div>
+  </div>
+  <div class="topbar-right">
+    <button class="snkr-help" onclick="document.getElementById('snkrModal').classList.add('show')">❓ SNKRDUNK란?</button>
+    <div class="btn-avatar">카</div>
+  </div>
+</header>
+
+<!-- SNKRDUNK 모달 -->
+<div class="modal-overlay" id="snkrModal" onclick="if(event.target===this)this.classList.remove('show')">
+  <div class="modal">
+    <div class="modal-header">
+      <div class="modal-title">SNKRDUNK란?</div>
+      <span class="modal-close" onclick="document.getElementById('snkrModal').classList.remove('show')">✕</span>
+    </div>
+    <div class="modal-body">
+      <strong>SNKRDUNK</strong>는 일본 최대 트레이딩 카드 & 스니커즈 리셀 플랫폼이에요.<br><br>
+      실제 거래된 가격을 기반으로 시세 데이터를 제공하기 때문에, 단순 호가가 아닌 <strong>실거래가</strong>를 확인할 수 있어요.<br><br>
+      TCG Hub는 이 데이터를 24시간 자동으로 가져와 원화로 환산해 보여드려요.
+      <div class="modal-tag">📊 실거래가 기반 · 24시간 자동 갱신</div>
+    </div>
+  </div>
+</div>
+
+<!-- 상세 패널 오버레이 -->
+<div class="detail-overlay" id="detailOverlay" onclick="closeDetail()"></div>
+
+<!-- 상세 패널 -->
+<div class="detail-panel" id="detailPanel">
+  <div class="detail-header">
+    <div class="detail-card-img pk-bg" id="d-img">🐾</div>
+    <div class="detail-info">
+      <span class="detail-badge pk" id="d-badge">POKEMON</span>
+      <div class="detail-name" id="d-name">뮤츠 ex SAR</div>
+      <div class="detail-name-en" id="d-name-en">Mewtwo ex SAR [M5 234/165]</div>
+      <div class="detail-pack" id="d-pack">📦 어비스아이 (Abyss Eye) · M5 · 2026.05.22 발매</div>
+    </div>
+    <div style="display:flex;flex-direction:column;align-items:flex-end;gap:8px;flex-shrink:0;">
+      <span class="detail-close" onclick="closeDetail()" title="닫기">✕</span>
+      <span class="detail-expand" id="expandBtn" onclick="toggleExpand()" title="확장">⤢</span>
+    </div>
+  </div>
+
+  <div class="detail-body">
+    <!-- 현재 시세 -->
+    <div class="current-price-box">
+      <div class="cpb-label">
+        SNKRDUNK 최저 실거래가
+        <span class="cpb-label-tip">— 실제 거래된 가격 중 최저값</span>
+      </div>
+      <div class="cpb-price" id="d-price">₩248,000</div>
+      <div class="cpb-usd" id="d-usd">≈ $155 (오늘 환율 기준)</div>
+      <div class="cpb-row">
+        <div class="cpb-stat">
+          <div class="cpb-stat-label">7일 변동</div>
+          <div class="cpb-stat-val up" id="d-7d">+12.4%</div>
+        </div>
+        <div class="cpb-stat">
+          <div class="cpb-stat-label">30일 변동</div>
+          <div class="cpb-stat-val up" id="d-30d">+18.7%</div>
+        </div>
+        <div class="cpb-stat">
+          <div class="cpb-stat-label">최고가</div>
+          <div class="cpb-stat-val" id="d-high">₩920,000</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- 차트 -->
+    <div class="chart-section">
+      <div class="chart-header">
+        <div class="chart-title">가격 · 거래량 히스토리</div>
+        <div class="chart-period">
+          <button class="period-btn" onclick="setPeriod(this)">30일</button>
+          <button class="period-btn" onclick="setPeriod(this)">90일</button>
+          <button class="period-btn active" onclick="setPeriod(this)">180일</button>
+          <button class="period-btn" onclick="setPeriod(this)">전체</button>
+        </div>
+      </div>
+      <div class="chart-wrap">
+        <svg viewBox="0 0 460 160" xmlns="http://www.w3.org/2000/svg">
+          <!-- 거래량 바 (배경) -->
+          <rect x="10" y="120" width="12" height="20" fill="#16A34A18" rx="2"/>
+          <rect x="30" y="110" width="12" height="30" fill="#16A34A18" rx="2"/>
+          <rect x="50" y="125" width="12" height="15" fill="#16A34A18" rx="2"/>
+          <rect x="70" y="105" width="12" height="35" fill="#16A34A18" rx="2"/>
+          <rect x="90" y="115" width="12" height="25" fill="#16A34A18" rx="2"/>
+          <rect x="110" y="100" width="12" height="40" fill="#16A34A18" rx="2"/>
+          <rect x="130" y="90" width="12" height="50" fill="#16A34A18" rx="2"/>
+          <rect x="150" y="118" width="12" height="22" fill="#16A34A18" rx="2"/>
+          <rect x="170" y="108" width="12" height="32" fill="#16A34A18" rx="2"/>
+          <rect x="190" y="95" width="12" height="45" fill="#16A34A18" rx="2"/>
+          <rect x="210" y="112" width="12" height="28" fill="#16A34A18" rx="2"/>
+          <rect x="230" y="102" width="12" height="38" fill="#16A34A18" rx="2"/>
+          <rect x="250" y="88" width="12" height="52" fill="#16A34A18" rx="2"/>
+          <rect x="270" y="118" width="12" height="22" fill="#16A34A18" rx="2"/>
+          <rect x="290" y="105" width="12" height="35" fill="#16A34A18" rx="2"/>
+          <rect x="310" y="92" width="12" height="48" fill="#16A34A18" rx="2"/>
+          <rect x="330" y="82" width="12" height="58" fill="#16A34A18" rx="2"/>
+          <rect x="350" y="108" width="12" height="32" fill="#16A34A18" rx="2"/>
+          <rect x="370" y="95" width="12" height="45" fill="#16A34A18" rx="2"/>
+          <rect x="390" y="78" width="12" height="62" fill="#16A34A18" rx="2"/>
+          <rect x="410" y="70" width="12" height="70" fill="#16A34A40" rx="2"/>
+          <rect x="430" y="60" width="12" height="80" fill="#16A34A60" rx="2"/>
+          <!-- 가격 라인 -->
+          <defs>
+            <linearGradient id="lineGrad" x1="0" y1="0" x2="0" y2="1">
+              <stop offset="0%" stop-color="#19DFDF" stop-opacity="0.15"/>
+              <stop offset="100%" stop-color="#19DFDF" stop-opacity="0"/>
+            </linearGradient>
+          </defs>
+          <path d="M16,95 L36,88 L56,92 L76,78 L96,82 L116,70 L136,60 L156,65 L176,58 L196,52 L216,56 L236,48 L256,42 L276,50 L296,44 L316,38 L336,32 L356,38 L376,30 L396,24 L416,20 L436,15" fill="none" stroke="#19DFDF" stroke-width="2" stroke-linejoin="round"/>
+          <path d="M16,95 L36,88 L56,92 L76,78 L96,82 L116,70 L136,60 L156,65 L176,58 L196,52 L216,56 L236,48 L256,42 L276,50 L296,44 L316,38 L336,32 L356,38 L376,30 L396,24 L416,20 L436,15 L436,140 L16,140 Z" fill="url(#lineGrad)"/>
+          <!-- 현재 포인트 -->
+          <circle cx="436" cy="15" r="4" fill="#19DFDF"/>
+          <circle cx="436" cy="15" r="7" fill="#19DFDF" opacity="0.2"/>
+          <!-- Y축 레이블 -->
+          <text x="2" y="18" font-size="9" fill="#999" font-family="sans-serif">₩250만</text>
+          <text x="2" y="80" font-size="9" fill="#999" font-family="sans-serif">₩50만</text>
+          <text x="2" y="142" font-size="9" fill="#999" font-family="sans-serif">₩10만</text>
+          <!-- X축 레이블 -->
+          <text x="10" y="155" font-size="9" fill="#999" font-family="sans-serif">2025.08</text>
+          <text x="180" y="155" font-size="9" fill="#999" font-family="sans-serif">2025.12</text>
+          <text x="380" y="155" font-size="9" fill="#999" font-family="sans-serif">2026.05</text>
+        </svg>
+      </div>
+      <div style="font-size:10px;color:var(--text-tertiary);margin-top:6px;padding:0 4px;">
+        ● 가격(KRW) &nbsp;▊ 거래량 · SNKRDUNK 실거래 기준 · spike 자동 제거
+      </div>
+    </div>
+
+    <!-- 액션 -->
+    <div class="action-row">
+      <button class="btn-primary">+ 포트폴리오 추가</button>
+      <button class="btn-secondary">☆ 관심 카드 &nbsp;<button style="font-size:11px;padding:2px 7px;border-radius:4px;border:1px solid #ddd;background:transparent;cursor:pointer;font-family:var(--font);color:var(--text-tertiary);">SNKRDUNK ↗</button></button>
+    </div>
+
+    <!-- 등급별 시세 -->
+    <div style="margin-bottom:20px;">
+      <div style="font-size:13px;font-weight:600;margin-bottom:10px;">등급별 시세</div>
+      <table style="width:100%;border-collapse:collapse;">
+        <thead>
+          <tr style="border-bottom:1px solid var(--border-subtle);">
+            <td style="font-size:11px;color:var(--text-tertiary);padding:0 0 7px;">등급</td>
+            <td style="font-size:11px;color:var(--text-tertiary);padding:0 0 7px;text-align:right;">가격</td>
+            <td style="font-size:11px;color:var(--text-tertiary);padding:0 0 7px;text-align:right;">7일 변동</td>
+          </tr>
+        </thead>
+        <tbody>
+          <tr style="border-bottom:1px solid var(--border-subtle);">
+            <td style="padding:9px 0;"><span style="font-size:11px;font-weight:600;padding:2px 8px;border-radius:4px;background:#FEF9C3;color:#854D0E;">PSA 10</span></td>
+            <td style="padding:9px 0;font-size:14px;font-weight:700;text-align:right;">₩420,000</td>
+            <td style="padding:9px 0;text-align:right;"><span style="font-size:11px;font-weight:600;padding:2px 6px;border-radius:4px;background:var(--price-up-subtle);color:var(--price-up-text);">▲ +8.2%</span></td>
+          </tr>
+          <tr style="border-bottom:1px solid var(--border-subtle);">
+            <td style="padding:9px 0;"><span style="font-size:11px;font-weight:600;padding:2px 8px;border-radius:4px;background:#EFEFEF;color:#444;">PSA 9</span></td>
+            <td style="padding:9px 0;font-size:14px;font-weight:700;text-align:right;">₩280,000</td>
+            <td style="padding:9px 0;text-align:right;"><span style="font-size:11px;font-weight:600;padding:2px 6px;border-radius:4px;background:var(--price-up-subtle);color:var(--price-up-text);">▲ +5.1%</span></td>
+          </tr>
+          <tr style="border-bottom:1px solid var(--border-subtle);">
+            <td style="padding:9px 0;"><span style="font-size:11px;font-weight:600;padding:2px 8px;border-radius:4px;background:#E8F4FD;color:#1A5FAD;">BGS 9.5</span></td>
+            <td style="padding:9px 0;font-size:14px;font-weight:700;text-align:right;">₩350,000</td>
+            <td style="padding:9px 0;text-align:right;"><span style="font-size:11px;font-weight:600;padding:2px 6px;border-radius:4px;background:var(--price-up-subtle);color:var(--price-up-text);">▲ +6.4%</span></td>
+          </tr>
+          <tr>
+            <td style="padding:9px 0;"><span style="font-size:11px;font-weight:600;padding:2px 8px;border-radius:4px;background:var(--bg-muted);color:var(--text-secondary);">A급 (RAW)</span></td>
+            <td style="padding:9px 0;font-size:14px;font-weight:700;text-align:right;">₩248,000</td>
+            <td style="padding:9px 0;text-align:right;"><span style="font-size:11px;font-weight:600;padding:2px 6px;border-radius:4px;background:var(--price-up-subtle);color:var(--price-up-text);">▲ +12.4%</span></td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+
+    <!-- 카드 정보 -->
+    <div style="font-size:13px;font-weight:600;margin-bottom:10px;">카드 정보</div>
+    <table class="info-table">
+      <tr><td>희귀도</td><td>SAR (Special Art Rare)</td></tr>
+      <tr><td>확장팩</td><td>어비스아이 M5</td></tr>
+      <tr><td>발매일</td><td>2026.05.22</td></tr>
+      <tr><td>데이터 출처</td><td>SNKRDUNK · 24시간 자동 갱신</td></tr>
+    </table>
+  </div>
+</div>
+
+<div class="body">
+  <!-- SIDEBAR -->
+  <aside class="sidebar">
+    <div class="nav-section">메뉴</div>
+    <div class="nav-item"><span class="nav-icon">🏠</span> 홈</div>
+    <div class="nav-item active"><span class="nav-icon">📈</span> 시세</div>
+    <div class="nav-item"><span class="nav-icon">📢</span> 소식</div>
+    <div class="nav-item"><span class="nav-icon">📚</span> 카드 도감</div>
+    <div class="nav-item"><span class="nav-icon">👤</span> 마이페이지</div>
+    <div class="nav-section">도구</div>
+    <div class="nav-item"><span class="nav-icon">📐</span> 센터링툴</div>
+    <div class="sidebar-bottom">
+      <button class="btn-install">📱 앱으로 설치</button>
+    </div>
+  </aside>
+
+  <!-- MAIN -->
+  <main class="main">
+    <div class="page-header">
+      <div class="page-title">시세</div>
+      <div class="page-desc">
+        <span class="live-dot"></span>
+        SNKRDUNK 실거래가 기준 · 24시간 자동 갱신
+      </div>
+    </div>
+
+    <!-- 브랜드 탭 -->
+    <div class="brand-tabs">
+      <div class="brand-tab active-pk" onclick="switchBrand(this,'pk')">⚡ 포켓몬</div>
+      <div class="brand-tab" onclick="switchBrand(this,'op')">🏴‍☠️ 원피스</div>
+    </div>
+
+    <!-- 타입 탭 -->
+    <div class="type-tabs">
+      <button class="type-tab active" onclick="switchType(this)">📦 박스</button>
+      <button class="type-tab" onclick="switchType(this)">🃏 카드</button>
+    </div>
+
+
+    <!-- 결과 정보 -->
+    <div class="results-info">
+      <div class="results-count"><strong>30개</strong> · 포켓몬 박스 · 매일 04:00 KST 자동 갱신</div>
+    </div>
+
+    <!-- 카드 그리드 -->
+    <div class="card-grid" id="cardGrid">
+
+      <div class="price-card" onclick="openDetail('뮤츠 ex SAR','Mewtwo ex SAR [M5 234/165]','어비스아이 (Abyss Eye) · M5 · 2026.05.22 발매','₩248,000','≈ $155','+12.4%','+18.7%','₩920,000','pk','🐾','pk-bg')">
+        <span class="card-fav">☆</span>
+        <div class="card-img-wrap pk-bg">🐾</div>
+        <div class="card-top"><div><div class="card-name">뮤츠 ex SAR</div><div class="card-name-en">Mewtwo ex SAR</div></div><span class="card-badge pk">PK</span></div>
+        <div class="card-pack">어비스아이 · M5</div>
+        <div class="mini-chart">
+          <div class="mini-bar" style="height:40%;background:#16A34A30;"></div><div class="mini-bar" style="height:55%;background:#16A34A40;"></div><div class="mini-bar" style="height:48%;background:#16A34A50;"></div><div class="mini-bar" style="height:70%;background:#16A34A60;"></div><div class="mini-bar" style="height:65%;background:#16A34A70;"></div><div class="mini-bar" style="height:85%;background:#16A34A80;"></div><div class="mini-bar" style="height:100%;background:#16A34A;"></div>
+        </div>
+        <div class="card-price-row"><div><div class="card-price">₩248,000</div><div class="card-price-sub">$155 · SNKRDUNK 최저 실거래가</div></div><span class="card-change up">▲ +12.4%</span></div>
+      </div>
+
+      <div class="price-card" onclick="openDetail('리자몽 ex SAR','Charizard ex SAR [M2a 230/193]','메가 드림 ex (MEGA Dream ex) · M2a · 2025.11.28 발매','₩186,000','≈ $123','+8.1%','+14.2%','₩520,000','pk','🔥','pk-bg')">
+        <span class="card-fav">☆</span>
+        <div class="card-img-wrap pk-bg">🔥</div>
+        <div class="card-top"><div><div class="card-name">리자몽 ex SAR</div><div class="card-name-en">Charizard ex SAR</div></div><span class="card-badge pk">PK</span></div>
+        <div class="card-pack">메가 드림 ex · M2a</div>
+        <div class="mini-chart">
+          <div class="mini-bar" style="height:60%;background:#16A34A30;"></div><div class="mini-bar" style="height:65%;background:#16A34A40;"></div><div class="mini-bar" style="height:72%;background:#16A34A50;"></div><div class="mini-bar" style="height:78%;background:#16A34A60;"></div><div class="mini-bar" style="height:82%;background:#16A34A70;"></div><div class="mini-bar" style="height:90%;background:#16A34A80;"></div><div class="mini-bar" style="height:100%;background:#16A34A;"></div>
+        </div>
+        <div class="card-price-row"><div><div class="card-price">₩186,000</div><div class="card-price-sub">$123 · SNKRDUNK 최저 실거래가</div></div><span class="card-change up">▲ +8.1%</span></div>
+      </div>
+
+      <div class="price-card" onclick="openDetail('피카츄 ex SAR','Pikachu ex SAR [M5 235/165]','어비스아이 (Abyss Eye) · M5 · 2026.05.22 발매','₩142,000','≈ $94','−2.3%','−5.1%','₩310,000','pk','⚡','pk-bg')">
+        <span class="card-fav">☆</span>
+        <div class="card-img-wrap pk-bg">⚡</div>
+        <div class="card-top"><div><div class="card-name">피카츄 ex SAR</div><div class="card-name-en">Pikachu ex SAR</div></div><span class="card-badge pk">PK</span></div>
+        <div class="card-pack">어비스아이 · M5</div>
+        <div class="mini-chart">
+          <div class="mini-bar" style="height:100%;background:#DC262620;"></div><div class="mini-bar" style="height:90%;background:#DC262630;"></div><div class="mini-bar" style="height:85%;background:#DC262640;"></div><div class="mini-bar" style="height:78%;background:#DC262650;"></div><div class="mini-bar" style="height:72%;background:#DC262660;"></div><div class="mini-bar" style="height:65%;background:#DC262670;"></div><div class="mini-bar" style="height:58%;background:#DC2626;"></div>
+        </div>
+        <div class="card-price-row"><div><div class="card-price">₩142,000</div><div class="card-price-sub">$94 · SNKRDUNK 최저 실거래가</div></div><span class="card-change down">▼ −2.3%</span></div>
+      </div>
+
+      <div class="price-card" onclick="openDetail('이브이 ex SAR','Eevee ex SAR [M4 198/150]','닌자 스페너 (Ninja Spinner) · M4 · 2026.03.13 발매','₩98,000','≈ $65','+4.7%','+9.2%','₩210,000','pk','🌿','pk-bg')">
+        <span class="card-fav">☆</span>
+        <div class="card-img-wrap pk-bg">🌿</div>
+        <div class="card-top"><div><div class="card-name">이브이 ex SAR</div><div class="card-name-en">Eevee ex SAR</div></div><span class="card-badge pk">PK</span></div>
+        <div class="card-pack">닌자 스페너 · M4</div>
+        <div class="mini-chart">
+          <div class="mini-bar" style="height:50%;background:#16A34A30;"></div><div class="mini-bar" style="height:58%;background:#16A34A40;"></div><div class="mini-bar" style="height:65%;background:#16A34A50;"></div><div class="mini-bar" style="height:74%;background:#16A34A60;"></div><div class="mini-bar" style="height:82%;background:#16A34A70;"></div><div class="mini-bar" style="height:90%;background:#16A34A80;"></div><div class="mini-bar" style="height:100%;background:#16A34A;"></div>
+        </div>
+        <div class="card-price-row"><div><div class="card-price">₩98,000</div><div class="card-price-sub">$65 · SNKRDUNK 최저 실거래가</div></div><span class="card-change up">▲ +4.7%</span></div>
+      </div>
+
+      <div class="price-card" onclick="openDetail('루기아 V SAR','Lugia V SAR [M2a 211/193]','메가 드림 ex (MEGA Dream ex) · M2a · 2025.11.28 발매','₩76,000','≈ $50','−1.2%','−3.8%','₩180,000','pk','🌊','pk-bg')">
+        <span class="card-fav">☆</span>
+        <div class="card-img-wrap pk-bg">🌊</div>
+        <div class="card-top"><div><div class="card-name">루기아 V SAR</div><div class="card-name-en">Lugia V SAR</div></div><span class="card-badge pk">PK</span></div>
+        <div class="card-pack">메가 드림 ex · M2a</div>
+        <div class="mini-chart">
+          <div class="mini-bar" style="height:100%;background:#DC262620;"></div><div class="mini-bar" style="height:92%;background:#DC262630;"></div><div class="mini-bar" style="height:88%;background:#DC262640;"></div><div class="mini-bar" style="height:82%;background:#DC262650;"></div><div class="mini-bar" style="height:78%;background:#DC262660;"></div><div class="mini-bar" style="height:72%;background:#DC262670;"></div><div class="mini-bar" style="height:66%;background:#DC2626;"></div>
+        </div>
+        <div class="card-price-row"><div><div class="card-price">₩76,000</div><div class="card-price-sub">$50 · SNKRDUNK 최저 실거래가</div></div><span class="card-change down">▼ −1.2%</span></div>
+      </div>
+
+      <div class="price-card" onclick="openDetail('뮤 ex SAR','Mew ex SAR [M4 199/150]','닌자 스페너 (Ninja Spinner) · M4 · 2026.03.13 발매','₩68,000','≈ $45','+3.1%','+7.4%','₩150,000','pk','✨','pk-bg')">
+        <span class="card-fav">☆</span>
+        <div class="card-img-wrap pk-bg">✨</div>
+        <div class="card-top"><div><div class="card-name">뮤 ex SAR</div><div class="card-name-en">Mew ex SAR</div></div><span class="card-badge pk">PK</span></div>
+        <div class="card-pack">닌자 스페너 · M4</div>
+        <div class="mini-chart">
+          <div class="mini-bar" style="height:45%;background:#16A34A30;"></div><div class="mini-bar" style="height:55%;background:#16A34A40;"></div><div class="mini-bar" style="height:62%;background:#16A34A50;"></div><div class="mini-bar" style="height:72%;background:#16A34A60;"></div><div class="mini-bar" style="height:80%;background:#16A34A70;"></div><div class="mini-bar" style="height:88%;background:#16A34A80;"></div><div class="mini-bar" style="height:100%;background:#16A34A;"></div>
+        </div>
+        <div class="card-price-row"><div><div class="card-price">₩68,000</div><div class="card-price-sub">$45 · SNKRDUNK 최저 실거래가</div></div><span class="card-change up">▲ +3.1%</span></div>
+      </div>
+
+      <div class="price-card" onclick="openDetail('게치스 SAR','Ghetsis SAR [M3 180/131]','무니키스 제로 (Nullifying Zero) · M3 · 2026.01.23 발매','₩54,000','≈ $36','−0.8%','−2.1%','₩120,000','pk','🌙','pk-bg')">
+        <span class="card-fav">☆</span>
+        <div class="card-img-wrap pk-bg">🌙</div>
+        <div class="card-top"><div><div class="card-name">게치스 SAR</div><div class="card-name-en">Ghetsis SAR</div></div><span class="card-badge pk">PK</span></div>
+        <div class="card-pack">무니키스 제로 · M3</div>
+        <div class="mini-chart">
+          <div class="mini-bar" style="height:100%;background:#DC262620;"></div><div class="mini-bar" style="height:95%;background:#DC262630;"></div><div class="mini-bar" style="height:90%;background:#DC262640;"></div><div class="mini-bar" style="height:85%;background:#DC262650;"></div><div class="mini-bar" style="height:80%;background:#DC262660;"></div><div class="mini-bar" style="height:76%;background:#DC262670;"></div><div class="mini-bar" style="height:72%;background:#DC2626;"></div>
+        </div>
+        <div class="card-price-row"><div><div class="card-price">₩54,000</div><div class="card-price-sub">$36 · SNKRDUNK 최저 실거래가</div></div><span class="card-change down">▼ −0.8%</span></div>
+      </div>
+
+      <div class="price-card" onclick="openDetail('팬텀 피카츄 SAR','Phantom Pikachu SAR [M5 236/165]','어비스아이 (Abyss Eye) · M5 · 2026.05.22 발매','₩43,700','≈ $29','+1.5%','+4.8%','₩95,000','pk','💫','pk-bg')">
+        <span class="card-fav">☆</span>
+        <div class="card-img-wrap pk-bg">💫</div>
+        <div class="card-top"><div><div class="card-name">팬텀 피카츄 SAR</div><div class="card-name-en">Phantom Pikachu SAR</div></div><span class="card-badge pk">PK</span></div>
+        <div class="card-pack">어비스아이 · M5</div>
+        <div class="mini-chart">
+          <div class="mini-bar" style="height:55%;background:#16A34A30;"></div><div class="mini-bar" style="height:62%;background:#16A34A40;"></div><div class="mini-bar" style="height:68%;background:#16A34A50;"></div><div class="mini-bar" style="height:75%;background:#16A34A60;"></div><div class="mini-bar" style="height:82%;background:#16A34A70;"></div><div class="mini-bar" style="height:90%;background:#16A34A80;"></div><div class="mini-bar" style="height:100%;background:#16A34A;"></div>
+        </div>
+        <div class="card-price-row"><div><div class="card-price">₩43,700</div><div class="card-price-sub">$29 · SNKRDUNK 최저 실거래가</div></div><span class="card-change up">▲ +1.5%</span></div>
+      </div>
+
+    </div>
+  </main>
+</div>
+
+<script>
+function openDetail(name, nameEn, pack, price, usd, d7, d30, high, brand, emoji, bg) {
+  document.getElementById('d-name').textContent = name;
+  document.getElementById('d-name-en').textContent = nameEn;
+  document.getElementById('d-pack').textContent = '📦 ' + pack;
+  document.getElementById('d-price').textContent = price;
+  document.getElementById('d-usd').textContent = usd + ' (오늘 환율 기준)';
+  document.getElementById('d-img').textContent = emoji;
+  document.getElementById('d-img').className = 'detail-card-img ' + bg;
+  document.getElementById('d-badge').textContent = brand === 'pk' ? 'POKEMON' : 'ONE PIECE';
+  document.getElementById('d-badge').className = 'detail-badge ' + brand;
+  const d7el = document.getElementById('d-7d');
+  d7el.textContent = d7;
+  d7el.className = 'cpb-stat-val ' + (d7.startsWith('+') ? 'up' : 'down');
+  const d30el = document.getElementById('d-30d');
+  d30el.textContent = d30;
+  d30el.className = 'cpb-stat-val ' + (d30.startsWith('+') ? 'up' : 'down');
+  document.getElementById('d-high').textContent = high;
+  document.getElementById('detailOverlay').classList.add('show');
+  document.getElementById('detailPanel').classList.add('show');
+  document.body.style.overflow = 'hidden';
+}
+function toggleExpand() {
+  const panel = document.getElementById('detailPanel');
+  const btn = document.getElementById('expandBtn');
+  const overlay = document.getElementById('detailOverlay');
+  const isExpanded = panel.classList.contains('expanded');
+  if (isExpanded) {
+    panel.classList.remove('expanded');
+    btn.textContent = '⤢';
+    btn.title = '확장';
+    overlay.style.display = 'block';
+  } else {
+    panel.classList.add('expanded');
+    btn.textContent = '⤡';
+    btn.title = '축소';
+    overlay.style.display = 'none';
+  }
+}
+function closeDetail() {
+  const panel = document.getElementById('detailPanel');
+  panel.classList.remove('expanded');
+  document.getElementById('expandBtn').textContent = '⤢';
+  document.getElementById('detailOverlay').classList.remove('show');
+  document.getElementById('detailPanel').classList.remove('show');
+  document.body.style.overflow = '';
+}
+function setPeriod(btn) {
+  document.querySelectorAll('.period-btn').forEach(b => b.classList.remove('active'));
+  btn.classList.add('active');
+}
+function switchBrand(tab, brand) {
+  document.querySelectorAll('.brand-tab').forEach(t => t.className = 'brand-tab');
+  tab.className = 'brand-tab active-' + brand;
+}
+function switchType(btn) {
+  document.querySelectorAll('.type-tab').forEach(b => b.classList.remove('active'));
+  btn.classList.add('active');
+}
+function toggleFilter(el) {
+  const group = el.closest('.filter-group');
+  if (group) group.querySelectorAll('.filter-chip').forEach(c => c.classList.remove('active'));
+  el.classList.add('active');
+}
+function resetFilters() {
+  document.querySelectorAll('.filter-chip').forEach(c => c.classList.remove('active'));
+  document.querySelector('.filter-chip').classList.add('active');
+}
+</script>
+</body>
+</html>

@@ -1,0 +1,846 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>TCG Hub — 카드 도감</title>
+<link href="https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+:root {
+  --brand: #19DFDF;
+  --brand-subtle: #E8FAFA;
+  --brand-text: #066666;
+  --price-up: #16A34A;
+  --price-up-subtle: #DCFCE7;
+  --price-up-text: #166534;
+  --price-down: #DC2626;
+  --price-down-subtle: #FEE2E2;
+  --price-down-text: #991B1B;
+  --pk: #D4A800;
+  --pk-subtle: #FEF9C3;
+  --pk-text: #7a5c00;
+  --op: #CC2244;
+  --op-subtle: #FEE2E2;
+  --op-text: #991B1B;
+  --bg-page: #F7F6F2;
+  --bg-surface: #FFFFFF;
+  --bg-muted: #EDECE8;
+  --border: #D9D8D3;
+  --border-subtle: #EDECE8;
+  --text-primary: #0D0D0D;
+  --text-secondary: #666560;
+  --text-tertiary: #999894;
+  --radius-sm: 6px;
+  --radius-md: 10px;
+  --radius-lg: 14px;
+  --shadow-sm: 0 1px 3px rgba(0,0,0,0.06);
+  --shadow-md: 0 4px 16px rgba(0,0,0,0.1);
+  --font: 'Noto Sans KR', sans-serif;
+  --sidebar-w: 200px;
+  --topbar-h: 52px;
+}
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+body { font-family: var(--font); background: var(--bg-page); color: var(--text-primary); font-size: 14px; line-height: 1.5; -webkit-font-smoothing: antialiased; }
+button { border: none; background: none; cursor: pointer; font-family: var(--font); }
+
+/* TOPBAR */
+.topbar { position: fixed; top: 0; left: 0; right: 0; z-index: 100; height: var(--topbar-h); background: var(--bg-surface); border-bottom: 1px solid var(--border-subtle); display: flex; align-items: center; }
+.topbar-logo { width: var(--sidebar-w); flex-shrink: 0; display: flex; align-items: center; gap: 8px; padding: 0 20px; height: 100%; border-right: 1px solid var(--border-subtle); }
+.logo-mark { width: 28px; height: 28px; border-radius: 8px; background: var(--brand); display: flex; align-items: center; justify-content: center; font-size: 14px; }
+.logo-text { font-size: 15px; font-weight: 700; letter-spacing: -0.01em; }
+.logo-sub { font-size: 10px; color: var(--text-tertiary); margin-top: 1px; }
+.topbar-center { flex: 1; padding: 0 20px; }
+.search-wrap { position: relative; width: 320px; }
+.search-wrap input { width: 100%; height: 34px; background: var(--bg-page); border: 1px solid var(--border); border-radius: 20px; padding: 0 12px 0 34px; font-size: 13px; font-family: var(--font); color: var(--text-primary); outline: none; transition: border-color 0.15s; }
+.search-wrap input:focus { border-color: var(--brand); }
+.search-wrap input::placeholder { color: var(--text-tertiary); }
+.search-icon { position: absolute; left: 11px; top: 50%; transform: translateY(-50%); color: var(--text-tertiary); font-size: 13px; }
+.topbar-right { display: flex; align-items: center; gap: 10px; padding-right: 20px; }
+.btn-avatar { width: 32px; height: 32px; border-radius: 50%; background: var(--brand-subtle); color: var(--brand-text); font-size: 12px; font-weight: 600; display: flex; align-items: center; justify-content: center; border: 1.5px solid var(--brand); cursor: pointer; }
+
+/* LAYOUT */
+.body { display: flex; padding-top: var(--topbar-h); min-height: 100vh; }
+.sidebar { width: var(--sidebar-w); position: fixed; top: var(--topbar-h); left: 0; bottom: 0; background: var(--bg-surface); border-right: 1px solid var(--border-subtle); padding: 16px 12px; display: flex; flex-direction: column; overflow-y: auto; z-index: 50; }
+.nav-section { font-size: 10px; font-weight: 500; color: var(--text-tertiary); letter-spacing: 0.07em; padding: 0 8px; margin-bottom: 6px; margin-top: 16px; }
+.nav-section:first-child { margin-top: 0; }
+.nav-item { display: flex; align-items: center; gap: 9px; padding: 8px 10px; border-radius: var(--radius-md); font-size: 13px; color: var(--text-secondary); cursor: pointer; transition: all 0.12s; margin-bottom: 1px; }
+.nav-item:hover { background: var(--bg-page); color: var(--text-primary); }
+.nav-item.active { background: var(--brand-subtle); color: var(--brand-text); font-weight: 600; }
+.nav-icon { font-size: 15px; width: 18px; text-align: center; flex-shrink: 0; }
+.nav-brand-badge { font-size: 10px; font-weight: 600; padding: 2px 8px; border-radius: 4px; }
+.nav-brand-badge.pk { background: var(--pk-subtle); color: var(--pk-text); }
+.nav-brand-badge.op { background: var(--op-subtle); color: var(--op-text); }
+.sidebar-bottom { margin-top: auto; padding-top: 12px; border-top: 1px solid var(--border-subtle); }
+.btn-install { width: 100%; padding: 8px 10px; border: 1px solid var(--border); border-radius: var(--radius-md); font-size: 12px; color: var(--text-secondary); background: transparent; text-align: left; cursor: pointer; }
+
+.main { margin-left: var(--sidebar-w); flex: 1; padding: 24px; max-width: 1100px; }
+
+/* PAGE HEADER */
+.page-header { margin-bottom: 20px; }
+.page-title { font-size: 22px; font-weight: 700; letter-spacing: -0.02em; margin-bottom: 4px; }
+.page-desc { font-size: 13px; color: var(--text-secondary); }
+
+/* BRAND TABS */
+.brand-tabs { display: flex; gap: 4px; border-bottom: 1px solid var(--border-subtle); margin-bottom: 24px; }
+.brand-tab { padding: 10px 16px; font-size: 13px; font-weight: 500; color: var(--text-tertiary); cursor: pointer; border-bottom: 2px solid transparent; margin-bottom: -1px; transition: all 0.12s; display: flex; align-items: center; gap: 6px; }
+.brand-tab:hover { color: var(--text-primary); }
+.brand-tab.active-pk { color: var(--pk-text); border-bottom-color: var(--pk); font-weight: 600; }
+.brand-tab.active-op { color: var(--op-text); border-bottom-color: var(--op); font-weight: 600; }
+.brand-tab.active-tool { color: var(--brand-text); border-bottom-color: var(--brand); font-weight: 600; }
+
+/* VIEW */
+.view { display: none; }
+.view.active { display: block; }
+
+/* PACK HERO — 카드 목록 상단 */
+.pack-hero {
+  display: flex; align-items: center; gap: 20px;
+  background: var(--bg-surface); border: 1px solid var(--border);
+  border-radius: var(--radius-lg); padding: 16px 20px;
+  margin-bottom: 20px; box-shadow: var(--shadow-sm);
+}
+.pack-hero-thumb {
+  width: 80px; height: 80px; border-radius: var(--radius-md);
+  display: flex; align-items: center; justify-content: center;
+  font-size: 40px; flex-shrink: 0;
+  box-shadow: var(--shadow-sm);
+}
+.pack-hero-info { flex: 1; min-width: 0; }
+.pack-hero-code { font-size: 11px; font-weight: 600; color: var(--text-tertiary); letter-spacing: 0.06em; margin-bottom: 4px; }
+.pack-hero-name { font-size: 20px; font-weight: 700; letter-spacing: -0.02em; margin-bottom: 6px; display: flex; align-items: baseline; gap: 8px; }
+.pack-hero-name-en { font-size: 13px; font-weight: 400; color: var(--text-tertiary); }
+.pack-hero-meta { display: flex; align-items: center; gap: 8px; font-size: 12px; color: var(--text-secondary); }
+
+/* =====================
+   확장팩 목록
+===================== */
+.pack-grid { display: grid; grid-template-columns: repeat(4, minmax(0,1fr)); gap: 12px; }
+.pack-card {
+  background: var(--bg-surface); border: 1px solid var(--border);
+  border-radius: var(--radius-lg); overflow: hidden;
+  cursor: pointer; transition: all 0.15s; box-shadow: var(--shadow-sm);
+}
+.pack-card:hover { border-color: var(--brand); box-shadow: var(--shadow-md); transform: translateY(-1px); }
+.pack-thumb {
+  width: 100%; aspect-ratio: 4/3;
+  display: flex; align-items: center; justify-content: center;
+  font-size: 52px;
+}
+.pack-body { padding: 12px 14px; }
+.pack-code { font-size: 10px; font-weight: 600; color: var(--text-tertiary); letter-spacing: 0.05em; margin-bottom: 3px; }
+.pack-name { font-size: 13px; font-weight: 600; color: var(--text-primary); margin-bottom: 2px; line-height: 1.3; }
+.pack-name-en { font-size: 11px; color: var(--text-tertiary); margin-bottom: 6px; }
+.pack-meta { display: flex; align-items: center; justify-content: space-between; }
+.pack-date { font-size: 11px; color: var(--text-tertiary); display: flex; align-items: center; gap: 4px; }
+.pack-count { font-size: 11px; color: var(--text-secondary); font-weight: 500; }
+.pack-new { font-size: 10px; font-weight: 600; padding: 1px 6px; border-radius: 4px; background: var(--brand-subtle); color: var(--brand-text); }
+
+/* =====================
+   카드 목록 (확장팩 상세)
+===================== */
+/* BREADCRUMB */
+.breadcrumb {
+  display: flex; align-items: center; gap: 6px;
+  font-size: 12px; color: var(--text-tertiary);
+  margin-bottom: 16px;
+}
+.breadcrumb-item { cursor: pointer; transition: color 0.12s; }
+.breadcrumb-item:hover { color: var(--brand-text); }
+.breadcrumb-sep { color: var(--border); }
+.breadcrumb-current { color: var(--text-primary); font-weight: 500; }
+
+/* PAGE SCREENS */
+.screen { display: none; }
+.screen.active { display: block; }
+.screen.slide-in {
+  animation: slideIn 0.25s cubic-bezier(0.4, 0, 0.2, 1) forwards;
+}
+.screen.slide-out {
+  animation: slideOut 0.2s cubic-bezier(0.4, 0, 0.2, 1) forwards;
+}
+.screen.slide-back {
+  animation: slideBack 0.25s cubic-bezier(0.4, 0, 0.2, 1) forwards;
+}
+@keyframes slideIn {
+  from { opacity: 0; transform: translateX(40px); }
+  to   { opacity: 1; transform: translateX(0); }
+}
+@keyframes slideOut {
+  from { opacity: 1; transform: translateX(0); }
+  to   { opacity: 0; transform: translateX(-30px); }
+}
+@keyframes slideBack {
+  from { opacity: 0; transform: translateX(-40px); }
+  to   { opacity: 1; transform: translateX(0); }
+}
+
+.card-list-header {
+  display: flex; align-items: center; gap: 12px;
+  margin-bottom: 20px; padding-bottom: 16px;
+  border-bottom: 1px solid var(--border-subtle);
+}
+.back-btn {
+  display: flex; align-items: center; gap: 5px;
+  font-size: 13px; color: var(--text-secondary);
+  padding: 6px 12px; border-radius: var(--radius-md);
+  border: 1px solid var(--border); cursor: pointer;
+  transition: all 0.12s; background: transparent; font-family: var(--font);
+}
+.back-btn:hover { border-color: var(--brand); color: var(--brand-text); }
+.card-list-pack-info { flex: 1; }
+.card-list-pack-name { font-size: 22px; font-weight: 700; letter-spacing: -0.02em; }
+.card-list-pack-sub { font-size: 12px; color: var(--text-tertiary); margin-top: 3px; display: flex; align-items: center; gap: 8px; }
+
+.rarity-filter { display: flex; gap: 6px; margin-bottom: 16px; flex-wrap: wrap; }
+.rarity-chip { font-size: 12px; padding: 4px 12px; border-radius: 20px; border: 1px solid var(--border); color: var(--text-secondary); cursor: pointer; transition: all 0.12s; background: transparent; font-family: var(--font); }
+.rarity-chip:hover { border-color: var(--brand); color: var(--brand-text); }
+.rarity-chip.active { background: var(--brand-subtle); border-color: var(--brand); color: var(--brand-text); font-weight: 500; }
+
+.cards-grid { display: grid; grid-template-columns: repeat(5, minmax(0,1fr)); gap: 10px; }
+.card-item {
+  background: var(--bg-surface); border: 1px solid var(--border);
+  border-radius: var(--radius-lg); overflow: hidden;
+  cursor: pointer; transition: all 0.15s; box-shadow: var(--shadow-sm);
+}
+.card-item:hover { border-color: var(--brand); box-shadow: var(--shadow-md); transform: translateY(-1px); }
+.card-item-thumb {
+  width: 100%; aspect-ratio: 3/4;
+  display: flex; align-items: center; justify-content: center;
+  font-size: 36px;
+}
+.card-item-body { padding: 8px 10px; }
+.card-item-rarity { font-size: 10px; font-weight: 600; padding: 1px 5px; border-radius: 3px; display: inline-block; margin-bottom: 3px; }
+.rarity-sar { background: #FEF3C7; color: #92400E; }
+.rarity-ar  { background: #EDE9FE; color: #5B21B6; }
+.rarity-sr  { background: #E0F2FE; color: #0369A1; }
+.rarity-r   { background: #DCFCE7; color: #166534; }
+.rarity-sp  { background: #FEE2E2; color: #991B1B; }
+.card-item-name { font-size: 12px; font-weight: 500; color: var(--text-primary); line-height: 1.3; margin-bottom: 2px; }
+.card-item-num { font-size: 10px; color: var(--text-tertiary); margin-bottom: 5px; }
+.card-item-price { font-size: 13px; font-weight: 700; color: var(--text-primary); }
+.card-item-change { font-size: 10px; font-weight: 600; padding: 1px 5px; border-radius: 3px; display: inline-block; margin-top: 2px; }
+.card-item-change.up { background: var(--price-up-subtle); color: var(--price-up-text); }
+.card-item-change.down { background: var(--price-down-subtle); color: var(--price-down-text); }
+.card-item-price-link {
+  display: flex; align-items: center; justify-content: space-between;
+  margin-top: 6px; padding-top: 6px;
+  border-top: 1px solid var(--border-subtle);
+}
+.card-item-see-price { font-size: 10px; font-weight: 600; color: var(--brand-text); }
+
+/* =====================
+   센터링툴
+===================== */
+.centering-wrap { max-width: 640px; }
+.centering-title { font-size: 18px; font-weight: 700; margin-bottom: 6px; }
+.centering-desc { font-size: 13px; color: var(--text-secondary); margin-bottom: 20px; line-height: 1.6; }
+.centering-upload-row { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; margin-bottom: 16px; }
+.upload-zone {
+  background: var(--bg-surface); border: 2px dashed var(--border);
+  border-radius: var(--radius-lg); padding: 28px 20px;
+  text-align: center; cursor: pointer; transition: all 0.15s;
+}
+.upload-zone:hover { border-color: var(--brand); background: var(--brand-subtle); }
+.upload-label { font-size: 12px; font-weight: 600; color: var(--text-tertiary); margin-bottom: 8px; letter-spacing: 0.04em; }
+.upload-icon { font-size: 32px; margin-bottom: 8px; }
+.upload-text { font-size: 13px; color: var(--text-secondary); margin-bottom: 10px; }
+.upload-btns { display: flex; gap: 6px; justify-content: center; }
+.upload-btn { padding: 6px 14px; border-radius: var(--radius-md); font-size: 12px; font-weight: 500; cursor: pointer; font-family: var(--font); transition: all 0.12s; }
+.upload-btn.primary { background: var(--text-primary); color: white; }
+.upload-btn.primary:hover { background: #333; }
+.upload-btn.secondary { border: 1px solid var(--border); color: var(--text-secondary); background: transparent; }
+.upload-btn.secondary:hover { border-color: var(--brand); color: var(--brand-text); }
+.centering-guide {
+  background: var(--bg-surface); border: 1px solid var(--border);
+  border-radius: var(--radius-lg); padding: 14px 16px;
+}
+.centering-guide-title { font-size: 12px; font-weight: 600; margin-bottom: 8px; display: flex; align-items: center; gap: 5px; }
+.guide-list { display: flex; flex-direction: column; gap: 5px; }
+.guide-item { font-size: 12px; color: var(--text-secondary); display: flex; align-items: flex-start; gap: 7px; line-height: 1.5; }
+.guide-item::before { content: '✓'; color: var(--brand-text); font-weight: 700; flex-shrink: 0; margin-top: 1px; }
+.centering-limit { font-size: 11px; color: var(--text-tertiary); margin-top: 10px; padding: 6px 10px; background: var(--bg-page); border-radius: var(--radius-sm); }
+</style>
+</head>
+<body>
+
+<!-- TOPBAR -->
+<header class="topbar">
+  <div class="topbar-logo">
+    <div class="logo-mark">⭐</div>
+    <div><div class="logo-text">TCG Hub</div><div class="logo-sub">Pokemon · One Piece</div></div>
+  </div>
+  <div class="topbar-center">
+    <div class="search-wrap">
+      <span class="search-icon">🔍</span>
+      <input type="text" placeholder="확장팩 · 카드명 검색 (예: 어비스아이, 리자몽, M5)">
+    </div>
+  </div>
+  <div class="topbar-right">
+    <div class="btn-avatar">카</div>
+  </div>
+</header>
+
+<div class="body">
+  <!-- SIDEBAR -->
+  <aside class="sidebar">
+    <div class="nav-section">메뉴</div>
+    <div class="nav-item"><span class="nav-icon">🏠</span> 홈</div>
+    <div class="nav-item"><span class="nav-icon">📈</span> 시세</div>
+    <div class="nav-item"><span class="nav-icon">📢</span> 소식</div>
+    <div class="nav-item active"><span class="nav-icon">📚</span> 카드 도감</div>
+    <div class="nav-item"><span class="nav-icon">👤</span> 마이페이지</div>
+    <div class="nav-section">도구</div>
+    <div class="nav-item"><span class="nav-icon">📐</span> 센터링툴</div>
+    <div class="sidebar-bottom">
+      <button class="btn-install">📱 앱으로 설치</button>
+    </div>
+  </aside>
+
+  <!-- MAIN -->
+  <main class="main">
+    <div class="page-header" id="page-header">
+      <div class="page-title">카드 도감</div>
+      <div class="page-desc">포켓몬 · 원피스 확장팩 목록과 수록 카드</div>
+    </div>
+
+    <!-- 브랜드 탭 — 항상 고정 -->
+    <div class="brand-tabs" id="brand-tabs">
+      <div class="brand-tab active-pk" onclick="switchBrand(this,'pk')">⚡ 포켓몬</div>
+      <div class="brand-tab" onclick="switchBrand(this,'op')">🏴‍☠️ 원피스</div>
+      <div class="brand-tab" onclick="switchBrand(this,'tool')">📐 센터링툴</div>
+    </div>
+
+    <!-- 콘텐츠 영역 — 이 안에서만 슬라이드 전환 -->
+    <div id="content-area" style="overflow:hidden; position:relative;">
+    <div class="screen active" id="screen-pk-packs">
+      <div class="pack-grid">
+        <div class="pack-card" onclick="openPack('pk')">
+          <div class="pack-thumb" style="background:linear-gradient(135deg,#E8FAFA,#19DFDF);">🌌</div>
+          <div class="pack-body">
+            <div class="pack-code">M5 · SCARLET & VIOLET</div>
+            <div class="pack-name">어비스아이</div>
+            <div class="pack-name-en">Abyss Eye</div>
+            <div class="pack-meta">
+              <div class="pack-date">📅 발매일 2026.05.22</div>
+              <span class="pack-new">NEW</span>
+            </div>
+            <div style="font-size:11px;color:var(--text-tertiary);margin-top:4px;">수록 165장</div>
+          </div>
+        </div>
+        <div class="pack-card" onclick="openPack('pk')">
+          <div class="pack-thumb" style="background:linear-gradient(135deg,#FEF9C3,#FFD700);">🥷</div>
+          <div class="pack-body">
+            <div class="pack-code">M4 · SCARLET & VIOLET</div>
+            <div class="pack-name">닌자 스페너</div>
+            <div class="pack-name-en">Ninja Spinner</div>
+            <div class="pack-meta">
+              <div class="pack-date">📅 발매일 2026.03.13</div>
+              <span class="pack-count">수록 150장</span>
+            </div>
+          </div>
+        </div>
+        <div class="pack-card" onclick="openPack('pk')">
+          <div class="pack-thumb" style="background:linear-gradient(135deg,#E8E8FF,#6666CC);">⚫</div>
+          <div class="pack-body">
+            <div class="pack-code">M3 · SCARLET & VIOLET</div>
+            <div class="pack-name">무니키스 제로</div>
+            <div class="pack-name-en">Nullifying Zero</div>
+            <div class="pack-meta">
+              <div class="pack-date">📅 발매일 2026.01.23</div>
+              <span class="pack-count">수록 131장</span>
+            </div>
+          </div>
+        </div>
+        <div class="pack-card" onclick="openPack('pk')">
+          <div class="pack-thumb" style="background:linear-gradient(135deg,#FFE4E1,#FF6B6B);">🐉</div>
+          <div class="pack-body">
+            <div class="pack-code">M2a · SCARLET & VIOLET</div>
+            <div class="pack-name">메가 드림 ex</div>
+            <div class="pack-name-en">MEGA Dream ex</div>
+            <div class="pack-meta">
+              <div class="pack-date">📅 발매일 2025.11.28</div>
+              <span class="pack-count">수록 193장</span>
+            </div>
+          </div>
+        </div>
+        <div class="pack-card" onclick="openPack('pk')">
+          <div class="pack-thumb" style="background:linear-gradient(135deg,#E0FFE0,#44BB44);">🎵</div>
+          <div class="pack-body">
+            <div class="pack-code">M2 · SCARLET & VIOLET</div>
+            <div class="pack-name">인페르노 X</div>
+            <div class="pack-name-en">Inferno X</div>
+            <div class="pack-meta">
+              <div class="pack-date">📅 발매일 2025.09.26</div>
+              <span class="pack-count">수록 115장</span>
+            </div>
+          </div>
+        </div>
+        <div class="pack-card" onclick="openPack('pk')">
+          <div class="pack-thumb" style="background:linear-gradient(135deg,#FFF0E0,#FF9944);">🦁</div>
+          <div class="pack-body">
+            <div class="pack-code">M1L · SCARLET & VIOLET</div>
+            <div class="pack-name">메가 브레이브</div>
+            <div class="pack-name-en">Mega Brave</div>
+            <div class="pack-meta">
+              <div class="pack-date">📅 발매일 2025.08.01</div>
+              <span class="pack-count">수록 104장</span>
+            </div>
+          </div>
+        </div>
+        <div class="pack-card" onclick="openPack('pk')">
+          <div class="pack-thumb" style="background:linear-gradient(135deg,#E8F4FD,#4499DD);">🌊</div>
+          <div class="pack-body">
+            <div class="pack-code">M1S · SCARLET & VIOLET</div>
+            <div class="pack-name">메가 심포니아</div>
+            <div class="pack-name-en">Mega Symphonia</div>
+            <div class="pack-meta">
+              <div class="pack-date">📅 발매일 2025.08.01</div>
+              <span class="pack-count">수록 98장</span>
+            </div>
+          </div>
+        </div>
+        <div class="pack-card" onclick="openPack('pk')">
+          <div class="pack-thumb" style="background:linear-gradient(135deg,#111,#333);">⚡</div>
+          <div class="pack-body">
+            <div class="pack-code">SV11B · SCARLET & VIOLET</div>
+            <div class="pack-name">블랙 볼트</div>
+            <div class="pack-name-en">Black Bolt</div>
+            <div class="pack-meta">
+              <div class="pack-date">📅 발매일 2025.06.06</div>
+              <span class="pack-count">수록 88장</span>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- 원피스 확장팩 목록 -->
+    <div class="screen" id="screen-op-packs">
+      <div class="pack-grid">
+        <div class="pack-card" onclick="openPack('op')">
+          <div class="pack-thumb" style="background:linear-gradient(135deg,#FEE2E2,#CC2244);">🏴‍☠️</div>
+          <div class="pack-body">
+            <div class="pack-code">OP-09</div>
+            <div class="pack-name">로망스 던</div>
+            <div class="pack-name-en">Romance Dawn</div>
+            <div class="pack-meta">
+              <div class="pack-date">📅 발매일 2026.05.10</div>
+              <span class="pack-new">NEW</span>
+            </div>
+            <div style="font-size:11px;color:var(--text-tertiary);margin-top:4px;">수록 121장</div>
+          </div>
+        </div>
+        <div class="pack-card" onclick="openPack('op')">
+          <div class="pack-thumb" style="background:linear-gradient(135deg,#FFF0E0,#FF8800);">🔥</div>
+          <div class="pack-body">
+            <div class="pack-code">OP-08</div>
+            <div class="pack-name">파라마운트 워</div>
+            <div class="pack-name-en">Paramount War</div>
+            <div class="pack-meta">
+              <div class="pack-date">📅 발매일 2026.02.28</div>
+              <span class="pack-count">수록 115장</span>
+            </div>
+          </div>
+        </div>
+        <div class="pack-card" onclick="openPack('op')">
+          <div class="pack-thumb" style="background:linear-gradient(135deg,#E8E8FF,#5555CC);">👒</div>
+          <div class="pack-body">
+            <div class="pack-code">OP-07</div>
+            <div class="pack-name">500년 뒤의 미래</div>
+            <div class="pack-name-en">500 Years in the Future</div>
+            <div class="pack-meta">
+              <div class="pack-date">📅 발매일 2025.12.05</div>
+              <span class="pack-count">수록 108장</span>
+            </div>
+          </div>
+        </div>
+        <div class="pack-card" onclick="openPack('op')">
+          <div class="pack-thumb" style="background:linear-gradient(135deg,#DCFCE7,#16A34A);">🌿</div>
+          <div class="pack-body">
+            <div class="pack-code">OP-06</div>
+            <div class="pack-name">쌍익의 패왕</div>
+            <div class="pack-name-en">Wings of the Captain</div>
+            <div class="pack-meta">
+              <div class="pack-date">📅 발매일 2025.09.27</div>
+              <span class="pack-count">수록 102장</span>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- 포켓몬 카드 목록 (확장팩 상세) -->
+    <div class="screen" id="screen-pk-cards">
+      <div class="pack-hero">
+        <div class="pack-hero-thumb" style="background:linear-gradient(135deg,#E8FAFA,#19DFDF);">🌌</div>
+        <div class="pack-hero-info">
+          <div class="pack-hero-code">M5 · SCARLET & VIOLET</div>
+          <div class="pack-hero-name">어비스아이<span class="pack-hero-name-en">Abyss Eye</span></div>
+          <div class="pack-hero-meta">
+            <span>📅 발매일 2026.05.22</span>
+            <span>·</span>
+            <span>수록 165장</span>
+          </div>
+        </div>
+        <button class="back-btn" onclick="goBack('pk')">← 목록으로</button>
+      </div>
+
+      <div class="rarity-filter">
+        <button class="rarity-chip active" onclick="toggleRarity(this)">전체</button>
+        <button class="rarity-chip" onclick="toggleRarity(this)">SAR</button>
+        <button class="rarity-chip" onclick="toggleRarity(this)">AR</button>
+        <button class="rarity-chip" onclick="toggleRarity(this)">SR</button>
+        <button class="rarity-chip" onclick="toggleRarity(this)">R</button>
+      </div>
+
+      <div class="cards-grid">
+        <div class="card-item" onclick="goToPrice()">
+          <div class="card-item-thumb" style="background:linear-gradient(135deg,#E8E8FF,#9999FF);">🐾</div>
+          <div class="card-item-body">
+            <span class="card-item-rarity rarity-sar">SAR</span>
+            <div class="card-item-name">뮤츠 ex</div>
+            <div class="card-item-num">234/165</div>
+            <div class="card-item-price-link">
+              <div>
+                <div class="card-item-price">₩248,000</div>
+                <div class="card-item-change up">▲ +12.4%</div>
+              </div>
+              <span class="card-item-see-price">시세 보기 →</span>
+            </div>
+          </div>
+        </div>
+        <div class="card-item" onclick="goToPrice()">
+          <div class="card-item-thumb" style="background:linear-gradient(135deg,#FFF0CC,#FFCC00);">⚡</div>
+          <div class="card-item-body">
+            <span class="card-item-rarity rarity-sar">SAR</span>
+            <div class="card-item-name">피카츄 ex</div>
+            <div class="card-item-num">235/165</div>
+            <div class="card-item-price-link">
+              <div>
+                <div class="card-item-price">₩142,000</div>
+                <div class="card-item-change down">▼ −2.3%</div>
+              </div>
+              <span class="card-item-see-price">시세 보기 →</span>
+            </div>
+          </div>
+        </div>
+        <div class="card-item" onclick="goToPrice()">
+          <div class="card-item-thumb" style="background:linear-gradient(135deg,#FFE4E1,#FF8888);">💫</div>
+          <div class="card-item-body">
+            <span class="card-item-rarity rarity-sar">SAR</span>
+            <div class="card-item-name">팬텀 피카츄</div>
+            <div class="card-item-num">236/165</div>
+            <div class="card-item-price-link">
+              <div>
+                <div class="card-item-price">₩43,700</div>
+                <div class="card-item-change up">▲ +1.5%</div>
+              </div>
+              <span class="card-item-see-price">시세 보기 →</span>
+            </div>
+          </div>
+        </div>
+        <div class="card-item" onclick="goToPrice()">
+          <div class="card-item-thumb" style="background:linear-gradient(135deg,#E8FFE8,#44BB44);">🌿</div>
+          <div class="card-item-body">
+            <span class="card-item-rarity rarity-ar">AR</span>
+            <div class="card-item-name">이상해꽃 ex</div>
+            <div class="card-item-num">166/165</div>
+            <div class="card-item-price-link">
+              <div>
+                <div class="card-item-price">₩28,500</div>
+                <div class="card-item-change up">▲ +3.2%</div>
+              </div>
+              <span class="card-item-see-price">시세 보기 →</span>
+            </div>
+          </div>
+        </div>
+        <div class="card-item" onclick="goToPrice()">
+          <div class="card-item-thumb" style="background:linear-gradient(135deg,#FFE4E1,#FF4444);">🔥</div>
+          <div class="card-item-body">
+            <span class="card-item-rarity rarity-ar">AR</span>
+            <div class="card-item-name">파이리 ex</div>
+            <div class="card-item-num">167/165</div>
+            <div class="card-item-price-link">
+              <div>
+                <div class="card-item-price">₩22,000</div>
+                <div class="card-item-change down">▼ −1.1%</div>
+              </div>
+              <span class="card-item-see-price">시세 보기 →</span>
+            </div>
+          </div>
+        </div>
+        <div class="card-item" onclick="goToPrice()">
+          <div class="card-item-thumb" style="background:linear-gradient(135deg,#E8F4FD,#4499DD);">🌊</div>
+          <div class="card-item-body">
+            <span class="card-item-rarity rarity-ar">AR</span>
+            <div class="card-item-name">꼬부기 ex</div>
+            <div class="card-item-num">168/165</div>
+            <div class="card-item-price-link">
+              <div>
+                <div class="card-item-price">₩19,800</div>
+                <div class="card-item-change up">▲ +0.8%</div>
+              </div>
+              <span class="card-item-see-price">시세 보기 →</span>
+            </div>
+          </div>
+        </div>
+        <div class="card-item" onclick="goToPrice()">
+          <div class="card-item-thumb" style="background:linear-gradient(135deg,#F3E8FF,#9966CC);">🌙</div>
+          <div class="card-item-body">
+            <span class="card-item-rarity rarity-sr">SR</span>
+            <div class="card-item-name">게치스</div>
+            <div class="card-item-num">180/165</div>
+            <div class="card-item-price-link">
+              <div>
+                <div class="card-item-price">₩54,000</div>
+                <div class="card-item-change down">▼ −0.8%</div>
+              </div>
+              <span class="card-item-see-price">시세 보기 →</span>
+            </div>
+          </div>
+        </div>
+        <div class="card-item" onclick="goToPrice()">
+          <div class="card-item-thumb" style="background:linear-gradient(135deg,#FFF8E1,#FFD700);">✨</div>
+          <div class="card-item-body">
+            <span class="card-item-rarity rarity-sr">SR</span>
+            <div class="card-item-name">뮤 ex</div>
+            <div class="card-item-num">181/165</div>
+            <div class="card-item-price-link">
+              <div>
+                <div class="card-item-price">₩68,000</div>
+                <div class="card-item-change up">▲ +3.1%</div>
+              </div>
+              <span class="card-item-see-price">시세 보기 →</span>
+            </div>
+          </div>
+        </div>
+        <div class="card-item" onclick="goToPrice()">
+          <div class="card-item-thumb" style="background:linear-gradient(135deg,#FFF0E0,#FF9944);">🦊</div>
+          <div class="card-item-body">
+            <span class="card-item-rarity rarity-r">R</span>
+            <div class="card-item-name">나인테일 V</div>
+            <div class="card-item-num">028/165</div>
+            <div class="card-item-price-link">
+              <div>
+                <div class="card-item-price">₩8,200</div>
+                <div class="card-item-change up">▲ +0.3%</div>
+              </div>
+              <span class="card-item-see-price">시세 보기 →</span>
+            </div>
+          </div>
+        </div>
+        <div class="card-item" onclick="goToPrice()">
+          <div class="card-item-thumb" style="background:linear-gradient(135deg,#E8E8E8,#888888);">🌫️</div>
+          <div class="card-item-body">
+            <span class="card-item-rarity rarity-r">R</span>
+            <div class="card-item-name">팬텀 가디</div>
+            <div class="card-item-num">045/165</div>
+            <div class="card-item-price-link">
+              <div>
+                <div class="card-item-price">₩6,500</div>
+                <div class="card-item-change down">▼ −0.5%</div>
+              </div>
+              <span class="card-item-see-price">시세 보기 →</span>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- 원피스 카드 목록 -->
+    <div class="screen" id="screen-op-cards">
+      <div class="pack-hero">
+        <div class="pack-hero-thumb" style="background:linear-gradient(135deg,#FEE2E2,#CC2244);">🏴‍☠️</div>
+        <div class="pack-hero-info">
+          <div class="pack-hero-code">OP-09</div>
+          <div class="pack-hero-name">로망스 던<span class="pack-hero-name-en">Romance Dawn</span></div>
+          <div class="pack-hero-meta">
+            <span>📅 발매일 2026.05.10</span>
+            <span>·</span>
+            <span>수록 121장</span>
+          </div>
+        </div>
+        <button class="back-btn" onclick="goBack('op')">← 목록으로</button>
+      </div>
+      <div class="rarity-filter">
+        <button class="rarity-chip active" onclick="toggleRarity(this)">전체</button>
+        <button class="rarity-chip" onclick="toggleRarity(this)">SP</button>
+        <button class="rarity-chip" onclick="toggleRarity(this)">SR</button>
+        <button class="rarity-chip" onclick="toggleRarity(this)">R</button>
+      </div>
+      <div class="cards-grid">
+        <div class="card-item" onclick="goToPrice()">
+          <div class="card-item-thumb" style="background:linear-gradient(135deg,#FEE2E2,#CC2244);">⚔️</div>
+          <div class="card-item-body">
+            <span class="card-item-rarity rarity-sp">SP</span>
+            <div class="card-item-name">조로</div>
+            <div class="card-item-num">OP09-118</div>
+            <div class="card-item-price-link">
+              <div>
+                <div class="card-item-price">₩320,000</div>
+                <div class="card-item-change up">▲ +18.2%</div>
+              </div>
+              <span class="card-item-see-price">시세 보기 →</span>
+            </div>
+          </div>
+        </div>
+        <div class="card-item" onclick="goToPrice()">
+          <div class="card-item-thumb" style="background:linear-gradient(135deg,#FFF0E0,#FF8844);">👒</div>
+          <div class="card-item-body">
+            <span class="card-item-rarity rarity-sp">SP</span>
+            <div class="card-item-name">루피</div>
+            <div class="card-item-num">OP09-119</div>
+            <div class="card-item-price-link">
+              <div>
+                <div class="card-item-price">₩284,000</div>
+                <div class="card-item-change up">▲ +9.6%</div>
+              </div>
+              <span class="card-item-see-price">시세 보기 →</span>
+            </div>
+          </div>
+        </div>
+        <div class="card-item" onclick="goToPrice()">
+          <div class="card-item-thumb" style="background:linear-gradient(135deg,#E8F4FD,#4488CC);">🗺️</div>
+          <div class="card-item-body">
+            <span class="card-item-rarity rarity-sr">SR</span>
+            <div class="card-item-name">나미</div>
+            <div class="card-item-num">OP09-110</div>
+            <div class="card-item-price-link">
+              <div>
+                <div class="card-item-price">₩156,000</div>
+                <div class="card-item-change down">▼ −3.1%</div>
+              </div>
+              <span class="card-item-see-price">시세 보기 →</span>
+            </div>
+          </div>
+        </div>
+        <div class="card-item" onclick="goToPrice()">
+          <div class="card-item-thumb" style="background:linear-gradient(135deg,#FFF8E1,#FFCC00);">🍳</div>
+          <div class="card-item-body">
+            <span class="card-item-rarity rarity-sr">SR</span>
+            <div class="card-item-name">상디</div>
+            <div class="card-item-num">OP09-112</div>
+            <div class="card-item-price-link">
+              <div>
+                <div class="card-item-price">₩124,000</div>
+                <div class="card-item-change up">▲ +6.4%</div>
+              </div>
+              <span class="card-item-see-price">시세 보기 →</span>
+            </div>
+          </div>
+        </div>
+        <div class="card-item" onclick="goToPrice()">
+          <div class="card-item-thumb" style="background:linear-gradient(135deg,#E8FFE8,#44AA44);">🌿</div>
+          <div class="card-item-body">
+            <span class="card-item-rarity rarity-r">R</span>
+            <div class="card-item-name">우솝</div>
+            <div class="card-item-num">OP09-040</div>
+            <div class="card-item-price-link">
+              <div>
+                <div class="card-item-price">₩12,000</div>
+                <div class="card-item-change up">▲ +1.2%</div>
+              </div>
+              <span class="card-item-see-price">시세 보기 →</span>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- 센터링툴 -->
+    <div class="screen" id="screen-tool">
+      <div class="centering-wrap">
+        <div class="centering-title">📐 카드 센터링 측정</div>
+        <div class="centering-desc">PSA · BGS 그레이딩 전 자가진단 도구예요. 카드 앞/뒷면 사진을 올리면 AI가 센터링 점수를 예측해드려요.</div>
+        <div class="centering-upload-row">
+          <div class="upload-zone">
+            <div class="upload-label">앞면 (FRONT)</div>
+            <div class="upload-icon">📤</div>
+            <div class="upload-text">드래그 앤 드롭 또는 선택</div>
+            <div class="upload-btns">
+              <button class="upload-btn primary">앨범</button>
+              <button class="upload-btn secondary">카메라</button>
+            </div>
+          </div>
+          <div class="upload-zone">
+            <div class="upload-label">뒷면 (BACK)</div>
+            <div class="upload-icon">📤</div>
+            <div class="upload-text">드래그 앤 드롭 또는 선택</div>
+            <div class="upload-btns">
+              <button class="upload-btn primary">앨범</button>
+              <button class="upload-btn secondary">카메라</button>
+            </div>
+          </div>
+        </div>
+        <div class="centering-guide">
+          <div class="centering-guide-title">📋 촬영 가이드</div>
+          <div class="guide-list">
+            <div class="guide-item">슬리브 없이 카드 정면 촬영 (단색 배경 권장)</div>
+            <div class="guide-item">카드 전체가 화면에 나오도록 촬영</div>
+            <div class="guide-item">앞면과 뒷면 둘 다 업로드해야 정확한 측정 가능</div>
+            <div class="guide-item">자동 감지 후 핸들 조정으로 정밀 측정</div>
+          </div>
+          <div class="centering-limit">⏱ 일 3회 무료 · 로그인 시 결과 저장 가능</div>
+        </div>
+      </div>
+    </div>
+
+    </div><!-- /content-area -->
+  </main>
+</div>
+
+<script>
+let currentBrand = 'pk';
+
+function showScreen(id, direction = 'forward') {
+  const current = document.querySelector('.screen.active');
+  const next = document.getElementById(id);
+  if (!next || current === next) return;
+
+  const inClass = direction === 'forward' ? 'slide-in' : 'slide-back';
+
+  // 현재 화면 즉시 숨김
+  if (current) current.classList.remove('active');
+
+  // 다음 화면 슬라이드 인
+  next.classList.add('active', inClass);
+  next.addEventListener('animationend', () => {
+    next.classList.remove(inClass);
+  }, { once: true });
+
+  window.scrollTo({ top: 0, behavior: 'smooth' });
+}
+
+function switchBrand(tab, brand) {
+  document.querySelectorAll('.brand-tab').forEach(t => t.className = 'brand-tab');
+  tab.className = 'brand-tab active-' + brand;
+  if (brand === 'tool') {
+    showScreen('screen-tool', 'forward');
+  } else {
+    currentBrand = brand;
+    showScreen('screen-' + brand + '-packs', 'forward');
+  }
+}
+
+function openPack(brand) {
+  currentBrand = brand;
+  showScreen('screen-' + brand + '-cards', 'forward');
+}
+
+function goBack(brand) {
+  showScreen('screen-' + brand + '-packs', 'back');
+  document.querySelectorAll('.brand-tab').forEach(t => t.className = 'brand-tab');
+  const tabs = document.querySelectorAll('.brand-tab');
+  if (brand === 'pk') tabs[0].className = 'brand-tab active-pk';
+  else if (brand === 'op') tabs[1].className = 'brand-tab active-op';
+}
+
+function toggleRarity(btn) {
+  btn.closest('.rarity-filter').querySelectorAll('.rarity-chip').forEach(c => c.classList.remove('active'));
+  btn.classList.add('active');
+}
+
+function goToPrice() {}
+</script>
+</body>
+</html>
