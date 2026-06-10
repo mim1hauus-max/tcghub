@@ -1,0 +1,534 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>TCG Hub — 홈</title>
+<link href="https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+:root {
+  --brand: #19DFDF;
+  --brand-hover: #0FB8B8;
+  --brand-subtle: #E8FAFA;
+  --brand-text: #066666;
+  --price-up: #16A34A;
+  --price-up-subtle: #DCFCE7;
+  --price-up-text: #166534;
+  --price-down: #DC2626;
+  --price-down-subtle: #FEE2E2;
+  --price-down-text: #991B1B;
+  --pk: #D4A800;
+  --pk-subtle: #FEF9C3;
+  --pk-text: #7a5c00;
+  --op: #CC2244;
+  --op-subtle: #FEE2E2;
+  --op-text: #991B1B;
+  --bg-page: #F7F6F2;
+  --bg-surface: #FFFFFF;
+  --bg-muted: #EDECE8;
+  --border: #D9D8D3;
+  --border-subtle: #EDECE8;
+  --text-primary: #0D0D0D;
+  --text-secondary: #666560;
+  --text-tertiary: #999894;
+  --radius-sm: 6px;
+  --radius-md: 10px;
+  --radius-lg: 14px;
+  --shadow-sm: 0 1px 3px rgba(0,0,0,0.06);
+  --shadow-md: 0 4px 12px rgba(0,0,0,0.08);
+  --font: 'Noto Sans KR', sans-serif;
+  --sidebar-w: 200px;
+  --topbar-h: 52px;
+}
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+body { font-family: var(--font); background: var(--bg-page); color: var(--text-primary); font-size: 14px; line-height: 1.5; -webkit-font-smoothing: antialiased; }
+button { border: none; background: none; cursor: pointer; font-family: var(--font); }
+
+/* TOPBAR */
+.topbar {
+  position: fixed; top: 0; left: 0; right: 0; z-index: 100;
+  height: var(--topbar-h);
+  background: var(--bg-surface);
+  border-bottom: 1px solid var(--border-subtle);
+  display: flex; align-items: center;
+}
+.topbar-logo {
+  width: var(--sidebar-w); flex-shrink: 0;
+  display: flex; align-items: center; gap: 8px;
+  padding: 0 20px; height: 100%;
+  border-right: 1px solid var(--border-subtle);
+}
+.logo-mark {
+  width: 28px; height: 28px; border-radius: 8px;
+  background: var(--brand);
+  display: flex; align-items: center; justify-content: center;
+  font-size: 14px;
+}
+.logo-text { font-size: 15px; font-weight: 700; letter-spacing: -0.01em; }
+.logo-sub { font-size: 10px; color: var(--text-tertiary); margin-top: 1px; }
+.topbar-center { flex: 1; padding: 0 20px; }
+.search-wrap { position: relative; width: 300px; }
+.search-wrap input {
+  width: 100%; height: 34px;
+  background: var(--bg-page); border: 1px solid var(--border);
+  border-radius: 20px; padding: 0 12px 0 34px;
+  font-size: 13px; font-family: var(--font); color: var(--text-primary);
+  outline: none; transition: border-color 0.15s;
+}
+.search-wrap input:focus { border-color: var(--brand); }
+.search-wrap input::placeholder { color: var(--text-tertiary); }
+.search-icon { position: absolute; left: 11px; top: 50%; transform: translateY(-50%); color: var(--text-tertiary); font-size: 13px; }
+.topbar-right { display: flex; align-items: center; gap: 10px; padding-right: 20px; }
+.snkr-help {
+  display: flex; align-items: center; gap: 5px;
+  font-size: 12px; color: var(--text-tertiary);
+  padding: 5px 10px; border-radius: 20px;
+  border: 1px solid var(--border); cursor: pointer;
+  transition: all 0.12s;
+}
+.snkr-help:hover { border-color: var(--brand); color: var(--brand-text); }
+.btn-avatar {
+  width: 32px; height: 32px; border-radius: 50%;
+  background: var(--brand-subtle); color: var(--brand-text);
+  font-size: 12px; font-weight: 600;
+  display: flex; align-items: center; justify-content: center;
+  border: 1.5px solid var(--brand); cursor: pointer;
+}
+
+/* LAYOUT */
+.body { display: flex; padding-top: var(--topbar-h); min-height: 100vh; }
+.sidebar {
+  width: var(--sidebar-w);
+  position: fixed; top: var(--topbar-h); left: 0; bottom: 0;
+  background: var(--bg-surface); border-right: 1px solid var(--border-subtle);
+  padding: 16px 12px; display: flex; flex-direction: column; overflow-y: auto; z-index: 50;
+}
+.nav-section { font-size: 10px; font-weight: 500; color: var(--text-tertiary); letter-spacing: 0.07em; padding: 0 8px; margin-bottom: 6px; margin-top: 16px; }
+.nav-section:first-child { margin-top: 0; }
+.nav-item {
+  display: flex; align-items: center; gap: 9px; padding: 8px 10px;
+  border-radius: var(--radius-md); font-size: 13px; color: var(--text-secondary);
+  cursor: pointer; transition: all 0.12s; margin-bottom: 1px;
+}
+.nav-item:hover { background: var(--bg-page); color: var(--text-primary); }
+.nav-item.active { background: var(--brand-subtle); color: var(--brand-text); font-weight: 600; }
+.nav-icon { font-size: 15px; width: 18px; text-align: center; flex-shrink: 0; }
+.nav-brand-badge { font-size: 10px; font-weight: 600; padding: 2px 8px; border-radius: 4px; }
+.nav-brand-badge.pk { background: var(--pk-subtle); color: var(--pk-text); }
+.nav-brand-badge.op { background: var(--op-subtle); color: var(--op-text); }
+.sidebar-bottom { margin-top: auto; padding-top: 12px; border-top: 1px solid var(--border-subtle); }
+.btn-install { width: 100%; padding: 8px 10px; border: 1px solid var(--border); border-radius: var(--radius-md); font-size: 12px; color: var(--text-secondary); background: transparent; text-align: left; cursor: pointer; transition: all 0.12s; }
+.btn-install:hover { border-color: var(--brand); color: var(--brand-text); }
+
+.main { margin-left: var(--sidebar-w); flex: 1; padding: 24px; max-width: 1100px; }
+
+/* SECTION */
+.section { margin-bottom: 24px; }
+.section-header { display: flex; align-items: center; justify-content: space-between; margin-bottom: 12px; }
+.section-title { font-size: 13px; font-weight: 600; color: var(--text-primary); display: flex; align-items: center; gap: 6px; }
+.section-title::before { content: ''; display: inline-block; width: 3px; height: 14px; background: var(--brand); border-radius: 2px; }
+.section-more { font-size: 12px; color: var(--brand-text); font-weight: 500; cursor: pointer; }
+.section-more:hover { color: var(--brand-hover); }
+
+/* SNKRDUNK MODAL */
+.modal-overlay {
+  display: none; position: fixed; inset: 0;
+  background: rgba(0,0,0,0.3); z-index: 200;
+  align-items: center; justify-content: center;
+}
+.modal-overlay.show { display: flex; }
+.modal {
+  background: var(--bg-surface); border-radius: var(--radius-lg);
+  padding: 24px; max-width: 420px; width: 90%;
+  box-shadow: 0 20px 60px rgba(0,0,0,0.15);
+}
+.modal-header { display: flex; align-items: center; justify-content: space-between; margin-bottom: 14px; }
+.modal-title { font-size: 15px; font-weight: 700; }
+.modal-close { font-size: 18px; color: var(--text-tertiary); cursor: pointer; }
+.modal-body { font-size: 13px; color: var(--text-secondary); line-height: 1.7; }
+.modal-body strong { color: var(--text-primary); font-weight: 600; }
+.modal-tag {
+  display: inline-block; margin-top: 12px;
+  font-size: 11px; font-weight: 600;
+  padding: 3px 10px; border-radius: 20px;
+  background: var(--brand-subtle); color: var(--brand-text);
+}
+
+/* ASSET WIDGET */
+.asset-widget {
+  background: #0D0D0D; border-radius: var(--radius-lg);
+  padding: 16px 20px; margin-bottom: 24px;
+  display: flex; align-items: center; gap: 20px;
+}
+.asset-main { flex: 1; }
+.asset-label { font-size: 11px; color: rgba(255,255,255,0.4); margin-bottom: 3px; }
+.asset-value { font-size: 24px; font-weight: 700; color: #fff; letter-spacing: -0.02em; }
+.asset-change { display: inline-flex; align-items: center; gap: 4px; font-size: 12px; font-weight: 500; padding: 2px 8px; border-radius: 20px; margin-top: 5px; }
+.asset-change.up { background: rgba(22,163,74,0.2); color: #4ade80; }
+.asset-divider { width: 1px; height: 40px; background: rgba(255,255,255,0.1); }
+.asset-stat { text-align: center; }
+.asset-stat-val { font-size: 15px; font-weight: 600; color: #fff; }
+.asset-stat-label { font-size: 10px; color: rgba(255,255,255,0.4); margin-top: 2px; }
+.asset-action { padding: 7px 14px; background: rgba(255,255,255,0.08); border-radius: var(--radius-md); font-size: 12px; font-weight: 500; color: rgba(255,255,255,0.6); cursor: pointer; transition: all 0.12s; white-space: nowrap; }
+.asset-action:hover { background: rgba(255,255,255,0.15); color: #fff; }
+
+/* TOP SUMMARY */
+.top-summary-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
+.brand-card { background: var(--bg-surface); border: 1px solid var(--border); border-radius: var(--radius-lg); overflow: hidden; box-shadow: var(--shadow-sm); }
+.brand-card-header { display: flex; align-items: center; justify-content: space-between; padding: 12px 14px 10px; border-bottom: 1px solid var(--border-subtle); }
+.brand-badge { font-size: 11px; font-weight: 600; padding: 3px 9px; border-radius: 20px; display: flex; align-items: center; gap: 5px; }
+.brand-badge.pk { background: var(--pk-subtle); color: var(--pk-text); }
+.brand-badge.op { background: var(--op-subtle); color: var(--op-text); }
+.brand-badge-dot { width: 6px; height: 6px; border-radius: 50%; }
+.brand-badge.pk .brand-badge-dot { background: var(--pk); }
+.brand-badge.op .brand-badge-dot { background: var(--op); }
+.brand-update { font-size: 10px; color: var(--text-tertiary); }
+
+/* PRICE ROW WITH IMAGE */
+.price-row {
+  display: flex; align-items: center; gap: 10px;
+  padding: 8px 14px; cursor: pointer; transition: background 0.1s;
+}
+.price-row:hover { background: var(--bg-page); }
+.price-rank { font-size: 11px; font-weight: 700; color: var(--text-tertiary); width: 14px; flex-shrink: 0; text-align: center; }
+.price-rank.top1 { color: #D4A800; }
+.price-rank.top2 { color: #888; }
+.price-rank.top3 { color: #A0522D; }
+
+/* 카드 이미지 (SVG 플레이스홀더) */
+.card-img {
+  width: 36px; height: 50px; border-radius: 4px;
+  flex-shrink: 0; overflow: hidden;
+  border: 1px solid var(--border-subtle);
+  background: var(--bg-muted);
+  display: flex; align-items: center; justify-content: center;
+  font-size: 18px;
+}
+.card-img.pk-img { background: linear-gradient(135deg, #FEF9C3, #FFD700); }
+.card-img.op-img { background: linear-gradient(135deg, #FEE2E2, #CC2244); }
+
+.price-info { flex: 1; min-width: 0; }
+.price-name { font-size: 12px; font-weight: 500; color: var(--text-primary); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.price-pack { font-size: 10px; color: var(--text-tertiary); margin-top: 1px; }
+.price-right { text-align: right; flex-shrink: 0; }
+.price-val { font-size: 13px; font-weight: 700; color: var(--text-primary); }
+.price-change { font-size: 10px; font-weight: 600; padding: 1px 5px; border-radius: 4px; display: inline-block; margin-top: 2px; }
+.price-change.up { background: var(--price-up-subtle); color: var(--price-up-text); }
+.price-change.down { background: var(--price-down-subtle); color: var(--price-down-text); }
+
+.price-list-hidden { display: none; border-top: 1px solid var(--border-subtle); }
+.price-list-hidden.show { display: block; }
+.brand-card-footer { border-top: 1px solid var(--border-subtle); }
+.expand-btn { width: 100%; padding: 9px; display: flex; align-items: center; justify-content: center; gap: 5px; font-size: 12px; font-weight: 500; color: var(--text-secondary); cursor: pointer; background: transparent; border: none; font-family: var(--font); transition: all 0.12s; }
+.expand-btn:hover { background: var(--bg-page); color: var(--text-primary); }
+.expand-btn .arrow { transition: transform 0.2s; font-size: 10px; }
+.expand-btn.open .arrow { transform: rotate(180deg); }
+
+/* HOT CARDS */
+.hot-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 10px; }
+.hot-card {
+  background: var(--bg-surface); border: 1px solid var(--border);
+  border-radius: var(--radius-lg); padding: 12px;
+  cursor: pointer; transition: all 0.15s; box-shadow: var(--shadow-sm);
+  display: flex; flex-direction: column; gap: 8px;
+}
+.hot-card:hover { border-color: var(--brand); transform: translateY(-1px); box-shadow: var(--shadow-md); }
+.hot-card-img {
+  width: 100%; aspect-ratio: 3/4; border-radius: var(--radius-md);
+  display: flex; align-items: center; justify-content: center;
+  font-size: 36px; flex-shrink: 0;
+}
+.hot-card-img.pk-bg { background: linear-gradient(135deg, #FEF9C3 0%, #FFE066 100%); }
+.hot-card-img.op-bg { background: linear-gradient(135deg, #FEE2E2 0%, #FF8899 100%); }
+.hot-card-name { font-size: 12px; font-weight: 500; color: var(--text-primary); line-height: 1.3; }
+.hot-card-price { font-size: 14px; font-weight: 700; color: var(--text-primary); }
+.hot-card-change { font-size: 11px; font-weight: 600; padding: 2px 7px; border-radius: 4px; display: inline-block; }
+.hot-card-change.up { background: var(--price-up-subtle); color: var(--price-up-text); }
+.hot-card-change.down { background: var(--price-down-subtle); color: var(--price-down-text); }
+.hot-label { font-size: 10px; font-weight: 600; letter-spacing: 0.05em; padding: 2px 6px; border-radius: 4px; display: inline-block; margin-bottom: -2px; }
+.hot-label.rising { background: var(--price-up-subtle); color: var(--price-up-text); }
+.hot-label.falling { background: var(--price-down-subtle); color: var(--price-down-text); }
+
+/* FILTER BAR */
+.filter-bar {
+  background: var(--bg-surface); border: 1px solid var(--border);
+  border-radius: var(--radius-lg); padding: 10px 14px;
+  display: flex; align-items: center; gap: 6px; flex-wrap: wrap;
+  box-shadow: var(--shadow-sm);
+  position: sticky; top: calc(var(--topbar-h) + 12px); z-index: 40;
+  margin-bottom: 20px;
+}
+.filter-label { font-size: 11px; font-weight: 500; color: var(--text-tertiary); margin-right: 4px; flex-shrink: 0; }
+.filter-divider { width: 1px; height: 16px; background: var(--border); margin: 0 2px; flex-shrink: 0; }
+.filter-chip { font-size: 12px; padding: 4px 11px; border-radius: 20px; border: 1px solid var(--border); color: var(--text-secondary); cursor: pointer; transition: all 0.12s; white-space: nowrap; background: transparent; font-family: var(--font); }
+.filter-chip:hover { border-color: var(--brand); color: var(--brand-text); }
+.filter-chip.active { background: var(--brand-subtle); border-color: var(--brand); color: var(--brand-text); font-weight: 500; }
+.filter-reset { margin-left: auto; font-size: 11px; color: var(--text-tertiary); cursor: pointer; padding: 4px 8px; border-radius: var(--radius-sm); transition: all 0.12s; }
+.filter-reset:hover { background: var(--bg-page); color: var(--text-secondary); }
+.filter-cta { font-size: 12px; font-weight: 500; color: var(--brand-text); padding: 4px 12px; border-radius: 20px; border: 1px solid var(--brand); background: var(--brand-subtle); cursor: pointer; white-space: nowrap; transition: all 0.12s; margin-left: 4px; }
+.filter-cta:hover { background: var(--brand); color: white; }
+
+/* GRADING BANNER */
+.grading-banner {
+  background: linear-gradient(135deg, #0D0D0D 0%, #1a1a2e 100%);
+  border-radius: var(--radius-lg); padding: 18px 20px;
+  display: flex; align-items: center; gap: 16px;
+  cursor: pointer; transition: transform 0.15s; margin-bottom: 24px;
+}
+.grading-banner:hover { transform: translateY(-1px); }
+.grading-icon { width: 44px; height: 44px; border-radius: 12px; background: rgba(25,223,223,0.15); display: flex; align-items: center; justify-content: center; font-size: 22px; flex-shrink: 0; }
+.grading-content { flex: 1; }
+.grading-label { font-size: 10px; font-weight: 600; color: var(--brand); letter-spacing: 0.07em; margin-bottom: 3px; }
+.grading-title { font-size: 15px; font-weight: 600; color: #fff; margin-bottom: 3px; }
+.grading-desc { font-size: 12px; color: rgba(255,255,255,0.45); }
+.grading-arrow { font-size: 20px; color: rgba(255,255,255,0.25); flex-shrink: 0; }
+
+/* NEWS GRID */
+.news-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 10px; }
+.news-card { background: var(--bg-surface); border: 1px solid var(--border); border-radius: var(--radius-lg); padding: 14px; cursor: pointer; transition: all 0.15s; display: flex; gap: 12px; box-shadow: var(--shadow-sm); }
+.news-card:hover { box-shadow: var(--shadow-md); transform: translateY(-1px); }
+.news-thumb { width: 56px; height: 56px; border-radius: var(--radius-md); flex-shrink: 0; display: flex; align-items: center; justify-content: center; font-size: 22px; }
+.news-body { flex: 1; min-width: 0; }
+.news-tag { font-size: 10px; font-weight: 600; color: var(--brand-text); margin-bottom: 3px; }
+.news-title { font-size: 12px; font-weight: 500; color: var(--text-primary); line-height: 1.4; margin-bottom: 5px; display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden; }
+.news-meta { font-size: 10px; color: var(--text-tertiary); }
+</style>
+</head>
+<body>
+
+<!-- TOPBAR -->
+<header class="topbar">
+  <div class="topbar-logo">
+    <div class="logo-mark">⭐</div>
+    <div>
+      <div class="logo-text">TCG Hub</div>
+      <div class="logo-sub">Pokemon · One Piece</div>
+    </div>
+  </div>
+  <div class="topbar-center">
+    <div class="search-wrap">
+      <span class="search-icon">🔍</span>
+      <input type="text" placeholder="카드 검색 (예: 리자몽, 루피, SAR)">
+    </div>
+  </div>
+  <div class="topbar-right">
+    <button class="snkr-help" onclick="document.getElementById('snkrModal').classList.add('show')">
+      ❓ SNKRDUNK란?
+    </button>
+    <div class="btn-avatar">카</div>
+  </div>
+</header>
+
+<!-- SNKRDUNK 모달 -->
+<div class="modal-overlay" id="snkrModal" onclick="if(event.target===this)this.classList.remove('show')">
+  <div class="modal">
+    <div class="modal-header">
+      <div class="modal-title">SNKRDUNK란?</div>
+      <span class="modal-close" onclick="document.getElementById('snkrModal').classList.remove('show')">✕</span>
+    </div>
+    <div class="modal-body">
+      <strong>SNKRDUNK</strong>는 일본 최대 트레이딩 카드 & 스니커즈 리셀 플랫폼이에요.<br><br>
+      실제 거래된 가격을 기반으로 시세 데이터를 제공하기 때문에, 단순 호가가 아닌 <strong>실거래가</strong>를 확인할 수 있어요.<br><br>
+      TCG Hub는 이 데이터를 24시간 자동으로 가져와 원화로 환산해 보여드려요.
+      <div class="modal-tag">📊 실거래가 기반 · 24시간 자동 갱신</div>
+    </div>
+  </div>
+</div>
+
+<div class="body">
+
+  <!-- SIDEBAR -->
+  <aside class="sidebar">
+    <div class="nav-section">메뉴</div>
+    <div class="nav-item active"><span class="nav-icon">🏠</span> 홈</div>
+    <div class="nav-item"><span class="nav-icon">📈</span> 시세</div>
+    <div class="nav-item"><span class="nav-icon">📢</span> 소식</div>
+    <div class="nav-item"><span class="nav-icon">📚</span> 카드 도감</div>
+    <div class="nav-item"><span class="nav-icon">👤</span> 마이페이지</div>
+    <div class="nav-section">도구</div>
+    <div class="nav-item"><span class="nav-icon">📐</span> 센터링툴</div>
+    <div class="sidebar-bottom">
+      <button class="btn-install">📱 앱으로 설치</button>
+    </div>
+  </aside>
+
+  <!-- MAIN -->
+  <main class="main">
+
+    <!-- 내 자산 위젯 -->
+    <div class="asset-widget">
+      <div class="asset-main">
+        <div class="asset-label">총 평가액</div>
+        <div class="asset-value">₩185,407</div>
+        <div class="asset-change up">▲ +₩184,175 · +14,950%</div>
+      </div>
+      <div class="asset-divider"></div>
+      <div class="asset-stat"><div class="asset-stat-val">3종</div><div class="asset-stat-label">보유 카드</div></div>
+      <div class="asset-divider"></div>
+      <div class="asset-stat"><div class="asset-stat-val">5종</div><div class="asset-stat-label">관심 카드</div></div>
+      <button class="asset-action">포트폴리오 →</button>
+    </div>
+
+    <!-- 브랜드별 TOP 시세 -->
+    <div class="section">
+      <div class="section-header">
+        <div class="section-title">브랜드별 TOP 시세</div>
+        <span class="section-more">전체 시세 보기 →</span>
+      </div>
+      <div class="top-summary-grid">
+
+        <!-- 포켓몬 -->
+        <div class="brand-card">
+          <div class="brand-card-header">
+            <div class="brand-badge pk"><div class="brand-badge-dot"></div>POKEMON</div>
+            <span class="brand-update">방금 업데이트</span>
+          </div>
+          <div class="price-row">
+            <span class="price-rank top1">1</span>
+            <div class="card-img pk-img">🐾</div>
+            <div class="price-info"><div class="price-name">뮤츠 ex SAR</div><div class="price-pack">어비스아이 · M5</div></div>
+            <div class="price-right"><div class="price-val">₩248,000</div><div class="price-change up">▲ +12.4%</div></div>
+          </div>
+          <div class="price-row">
+            <span class="price-rank top2">2</span>
+            <div class="card-img pk-img">🔥</div>
+            <div class="price-info"><div class="price-name">리자몽 ex SAR</div><div class="price-pack">메가 드림 ex · M2a</div></div>
+            <div class="price-right"><div class="price-val">₩186,000</div><div class="price-change up">▲ +8.1%</div></div>
+          </div>
+          <div class="price-row">
+            <span class="price-rank top3">3</span>
+            <div class="card-img pk-img">⚡</div>
+            <div class="price-info"><div class="price-name">피카츄 ex SAR</div><div class="price-pack">어비스아이 · M5</div></div>
+            <div class="price-right"><div class="price-val">₩142,000</div><div class="price-change down">▼ −2.3%</div></div>
+          </div>
+          <div class="price-list-hidden" id="pk-more">
+            <div class="price-row"><span class="price-rank">4</span><div class="card-img pk-img">🌿</div><div class="price-info"><div class="price-name">이브이 ex SAR</div><div class="price-pack">닌자 스페너 · M4</div></div><div class="price-right"><div class="price-val">₩98,000</div><div class="price-change up">▲ +4.7%</div></div></div>
+            <div class="price-row"><span class="price-rank">5</span><div class="card-img pk-img">🌊</div><div class="price-info"><div class="price-name">루기아 V SAR</div><div class="price-pack">메가 드림 ex · M2a</div></div><div class="price-right"><div class="price-val">₩76,000</div><div class="price-change down">▼ −1.2%</div></div></div>
+            <div class="price-row"><span class="price-rank">6</span><div class="card-img pk-img">✨</div><div class="price-info"><div class="price-name">뮤 ex SAR</div><div class="price-pack">닌자 스페너 · M4</div></div><div class="price-right"><div class="price-val">₩68,000</div><div class="price-change up">▲ +3.1%</div></div></div>
+            <div class="price-row"><span class="price-rank">7</span><div class="card-img pk-img">🌙</div><div class="price-info"><div class="price-name">게치스 SAR</div><div class="price-pack">무니키스 제로 · M3</div></div><div class="price-right"><div class="price-val">₩54,000</div><div class="price-change down">▼ −0.8%</div></div></div>
+            <div class="price-row"><span class="price-rank">8</span><div class="card-img pk-img">💫</div><div class="price-info"><div class="price-name">팬텀 피카츄</div><div class="price-pack">어비스아이 · M5</div></div><div class="price-right"><div class="price-val">₩43,700</div><div class="price-change up">▲ +1.5%</div></div></div>
+            <div class="price-row"><span class="price-rank">9</span><div class="card-img pk-img">💧</div><div class="price-info"><div class="price-name">워터 이브이 SAR</div><div class="price-pack">닌자 스페너 · M4</div></div><div class="price-right"><div class="price-val">₩38,200</div><div class="price-change down">▼ −2.1%</div></div></div>
+            <div class="price-row"><span class="price-rank">10</span><div class="card-img pk-img">🌸</div><div class="price-info"><div class="price-name">비주기 SAR</div><div class="price-pack">무니키스 제로 · M3</div></div><div class="price-right"><div class="price-val">₩31,500</div><div class="price-change up">▲ +0.6%</div></div></div>
+          </div>
+          <div class="brand-card-footer">
+            <button class="expand-btn" id="pk-btn" onclick="toggleMore('pk')">
+              TOP 10 더보기 <span class="arrow">▼</span>
+            </button>
+          </div>
+        </div>
+
+        <!-- 원피스 -->
+        <div class="brand-card">
+          <div class="brand-card-header">
+            <div class="brand-badge op"><div class="brand-badge-dot"></div>ONE PIECE</div>
+            <span class="brand-update">방금 업데이트</span>
+          </div>
+          <div class="price-row">
+            <span class="price-rank top1">1</span>
+            <div class="card-img op-img">⚔️</div>
+            <div class="price-info"><div class="price-name">조로 SP</div><div class="price-pack">로망스 던 · OP-01</div></div>
+            <div class="price-right"><div class="price-val">₩320,000</div><div class="price-change up">▲ +18.2%</div></div>
+          </div>
+          <div class="price-row">
+            <span class="price-rank top2">2</span>
+            <div class="card-img op-img">👒</div>
+            <div class="price-info"><div class="price-name">루피 SP</div><div class="price-pack">로망스 던 · OP-01</div></div>
+            <div class="price-right"><div class="price-val">₩284,000</div><div class="price-change up">▲ +9.6%</div></div>
+          </div>
+          <div class="price-row">
+            <span class="price-rank top3">3</span>
+            <div class="card-img op-img">🗺️</div>
+            <div class="price-info"><div class="price-name">나미 SR</div><div class="price-pack">파라마운트 워 · OP-02</div></div>
+            <div class="price-right"><div class="price-val">₩156,000</div><div class="price-change down">▼ −3.1%</div></div>
+          </div>
+          <div class="price-list-hidden" id="op-more">
+            <div class="price-row"><span class="price-rank">4</span><div class="card-img op-img">🍳</div><div class="price-info"><div class="price-name">상디 SR</div><div class="price-pack">파라마운트 워 · OP-02</div></div><div class="price-right"><div class="price-val">₩124,000</div><div class="price-change up">▲ +6.4%</div></div></div>
+            <div class="price-row"><span class="price-rank">5</span><div class="card-img op-img">🔥</div><div class="price-info"><div class="price-name">에이스 SP</div><div class="price-pack">필라프 · OP-04</div></div><div class="price-right"><div class="price-val">₩98,000</div><div class="price-change up">▲ +2.8%</div></div></div>
+            <div class="price-row"><span class="price-rank">6</span><div class="card-img op-img">💀</div><div class="price-info"><div class="price-name">섀크 SR</div><div class="price-pack">각성 · OP-05</div></div><div class="price-right"><div class="price-val">₩87,000</div><div class="price-change down">▼ −1.4%</div></div></div>
+            <div class="price-row"><span class="price-rank">7</span><div class="card-img op-img">📖</div><div class="price-info"><div class="price-name">로빈 SR</div><div class="price-pack">각성 · OP-05</div></div><div class="price-right"><div class="price-val">₩72,000</div><div class="price-change up">▲ +4.2%</div></div></div>
+            <div class="price-row"><span class="price-rank">8</span><div class="card-img op-img">🤖</div><div class="price-info"><div class="price-name">프랑키 SR</div><div class="price-pack">파라마운트 워 · OP-02</div></div><div class="price-right"><div class="price-val">₩61,500</div><div class="price-change down">▼ −0.9%</div></div></div>
+            <div class="price-row"><span class="price-rank">9</span><div class="card-img op-img">🎵</div><div class="price-info"><div class="price-name">브룩 SR</div><div class="price-pack">필라프 · OP-04</div></div><div class="price-right"><div class="price-val">₩54,000</div><div class="price-change up">▲ +1.7%</div></div></div>
+            <div class="price-row"><span class="price-rank">10</span><div class="card-img op-img">🦌</div><div class="price-info"><div class="price-name">쵸파 SR</div><div class="price-pack">각성 · OP-05</div></div><div class="price-right"><div class="price-val">₩43,000</div><div class="price-change up">▲ +0.5%</div></div></div>
+          </div>
+          <div class="brand-card-footer">
+            <button class="expand-btn" id="op-btn" onclick="toggleMore('op')">
+              TOP 10 더보기 <span class="arrow">▼</span>
+            </button>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- 그레이딩 배너 -->
+    <div class="grading-banner">
+      <div class="grading-icon">🏆</div>
+      <div class="grading-content">
+        <div class="grading-label">PSA · BGS 그레이딩</div>
+        <div class="grading-title">카드 등급 받고 가치를 높이세요</div>
+        <div class="grading-desc">앞/뒷면 사진으로 AI 자가진단 · 그레이딩 업체 안내 · 일 3회 무료</div>
+      </div>
+      <div class="grading-arrow">→</div>
+    </div>
+
+    <!-- 소식 큐레이션 -->
+    <div class="section">
+      <div class="section-header">
+        <div class="section-title">소식</div>
+        <span class="section-more">전체 보기 →</span>
+      </div>
+      <div class="news-grid">
+        <div class="news-card">
+          <div class="news-thumb" style="background:#FEF9C3;">🎪</div>
+          <div class="news-body">
+            <div class="news-tag">이벤트 · 응모</div>
+            <div class="news-title">포켓몬 어비스아이 현장 사전 추첨 — 5월 22일 발매</div>
+            <div class="news-meta">2026.05.16</div>
+          </div>
+        </div>
+        <div class="news-card">
+          <div class="news-thumb" style="background:#FEE2E2;">🏴‍☠️</div>
+          <div class="news-body">
+            <div class="news-tag">발매</div>
+            <div class="news-title">원피스 OP-09 로망스 던 2차 발매 확정</div>
+            <div class="news-meta">2026.05.17</div>
+          </div>
+        </div>
+        <div class="news-card">
+          <div class="news-thumb" style="background:#E8FAFA;">📊</div>
+          <div class="news-body">
+            <div class="news-tag">시세</div>
+            <div class="news-title">이번 주 급등 카드 TOP 5 — 뮤츠 SAR 신고가 경신</div>
+            <div class="news-meta">2026.05.16</div>
+          </div>
+        </div>
+        <div class="news-card">
+          <div class="news-thumb" style="background:#FEF9C3;">🎰</div>
+          <div class="news-body">
+            <div class="news-tag">오리파</div>
+            <div class="news-title">5월 오리파 수익률 분석 — 어디가 제일 좋았나</div>
+            <div class="news-meta">2026.05.15</div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+  </main>
+</div>
+
+<script>
+function toggleMore(brand) {
+  const list = document.getElementById(brand + '-more');
+  const btn = document.getElementById(brand + '-btn');
+  const isOpen = list.classList.contains('show');
+  list.classList.toggle('show');
+  btn.classList.toggle('open');
+  btn.childNodes[0].textContent = isOpen ? 'TOP 10 더보기 ' : '접기 ';
+}
+function toggleFilter(el) { el.classList.toggle('active'); }
+function resetFilters() {
+  document.querySelectorAll('.filter-chip').forEach(c => c.classList.remove('active'));
+  document.querySelector('.filter-chip').classList.add('active');
+}
+</script>
+</body>
+</html>
