@@ -1,0 +1,190 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>TCG Hub — 박스 상세 (Mobile)</title>
+<link href="https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+:root {
+  --brand: #19DFDF;
+  --brand-subtle: #CFFAFA;
+  --brand-text: #066666;
+  --pk-subtle: #FEF9C3;
+  --pk: #FFD700;
+  --pk-text: #854D0E;
+  --bg-page: #F7F6F2;
+  --bg-surface: #FFFFFF;
+  --bg-muted: #EDECE8;
+  --border: #D9D8D3;
+  --border-subtle: #EDECE8;
+  --text-primary: #0D0D0D;
+  --text-secondary: #666560;
+  --text-tertiary: #888780;
+  --radius-md: 8px;
+  --radius-lg: 12px;
+  --radius-xl: 16px;
+  --font: 'Noto Sans KR', sans-serif;
+}
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+html, body { max-width: 480px; margin: 0 auto; background: #2C2C2A; }
+body { font-family: var(--font); color: var(--text-primary); font-size: 14px; line-height: 1.5; -webkit-font-smoothing: antialiased; }
+button { border: none; background: none; cursor: pointer; font-family: var(--font); }
+
+.detail-panel { background: var(--bg-surface); min-height: 100vh; padding-bottom: 70px; position: relative; }
+
+/* 헤더 */
+.detail-header {
+  display: flex; align-items: center; justify-content: space-between;
+  padding: 14px 16px; border-bottom: 1px solid var(--border-subtle);
+  position: sticky; top: 0; background: var(--bg-surface); z-index: 10; gap: 10px;
+}
+.icon-btn { width: 24px; height: 24px; display: flex; align-items: center; justify-content: center; color: var(--text-primary); flex-shrink: 0; }
+.icon-btn svg { width: 22px; height: 22px; }
+.price-btn {
+  display: flex; align-items: center; gap: 5px;
+  background: var(--text-secondary); color: white;
+  padding: 6px 12px; border-radius: var(--radius-md);
+  font-size: 13px; font-weight: 500; white-space: nowrap; flex-shrink: 0;
+}
+.price-btn svg { width: 16px; height: 16px; }
+.header-actions { display: flex; gap: 14px; align-items: center; margin-left: auto; }
+
+/* 메인 정보 */
+.main-info { display: flex; gap: 14px; padding: 18px 16px; border-bottom: 1px solid var(--border); }
+.main-info-img { width: 64px; height: 86px; border-radius: 8px; background: var(--bg-muted); flex-shrink: 0; }
+.main-info-text { flex: 1; min-width: 0; display: flex; flex-direction: column; gap: 6px; }
+.brand-badge { display: inline-flex; align-items: center; gap: 4px; padding: 2px 8px; border-radius: 9999px; background: var(--pk-subtle); width: fit-content; }
+.brand-badge-dot { width: 6px; height: 6px; border-radius: 3px; background: var(--pk); }
+.brand-badge-text { font-size: 11px; font-weight: 600; color: var(--pk-text); }
+.main-info-code { font-size: 13px; color: var(--text-tertiary); }
+.main-info-title { font-size: 15px; font-weight: 600; color: var(--text-primary); }
+.main-info-date { font-size: 13px; color: var(--text-tertiary); }
+
+/* 카드 수록 정보 */
+.info-row { display: flex; align-items: center; gap: 10px; padding: 14px 16px 10px; }
+.info-count { font-size: 13px; font-weight: 600; color: var(--text-secondary); display: flex; align-items: center; gap: 4px; }
+.info-count svg { width: 16px; height: 16px; }
+.info-tip { font-size: 11px; color: var(--text-tertiary); }
+
+/* 카드 그리드 (모바일 2열) */
+.card-grid { display: grid; grid-template-columns: repeat(2, minmax(0,1fr)); gap: 12px; padding: 6px 16px 16px; }
+.inner-card { background: var(--bg-surface); border: 1px solid var(--border); border-radius: var(--radius-xl); padding: 10px; display: flex; flex-direction: column; align-items: center; gap: 6px; }
+.inner-card-img { width: 100%; aspect-ratio: 203/285; background: var(--bg-muted); border-radius: 10px; display: flex; align-items: center; justify-content: center; }
+.inner-card-img svg { width: 24px; height: 24px; color: var(--text-tertiary); opacity: 0.6; }
+.inner-card-num { font-size: 12px; color: var(--text-tertiary); text-align: center; }
+
+/* 페이지네이션 */
+.pagination-wrap {
+  position: fixed; bottom: 0; left: 0; right: 0;
+  max-width: 480px; margin: 0 auto;
+  background: var(--bg-surface); border-top: 1px solid var(--border-subtle);
+  padding: 12px 16px; display: flex; align-items: center; justify-content: center; gap: 4px;
+  overflow-x: auto;
+}
+.page-nav-btn { width: 20px; height: 20px; display: flex; align-items: center; justify-content: center; color: var(--text-secondary); flex-shrink: 0; }
+.page-nav-btn svg { width: 18px; height: 18px; }
+.page-num { min-width: 28px; height: 28px; display: flex; align-items: center; justify-content: center; border-radius: 4px; font-size: 13px; font-weight: 500; color: var(--text-secondary); flex-shrink: 0; }
+.page-num.active { background: var(--text-tertiary); color: white; }
+</style>
+</head>
+<body>
+
+<div class="detail-panel">
+
+  <!-- 헤더 -->
+  <div class="detail-header">
+    <button class="icon-btn"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M8 3H5a2 2 0 00-2 2v3M16 3h3a2 2 0 012 2v3M8 21H5a2 2 0 01-2-2v-3M16 21h3a2 2 0 002-2v-3"/></svg></button>
+    <button class="price-btn">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 17l5-6 4 3 7-8"/><path d="M14 6h5v5"/></svg>
+      시세 보기
+    </button>
+    <div class="header-actions">
+      <button class="icon-btn"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="18" cy="5" r="3"/><circle cx="6" cy="12" r="3"/><circle cx="18" cy="19" r="3"/><path d="M8.6 13.5l6.8 4M15.4 6.5l-6.8 4"/></svg></button>
+      <button class="icon-btn"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M18 6L6 18M6 6l12 12"/></svg></button>
+    </div>
+  </div>
+
+  <!-- 메인 정보 -->
+  <div class="main-info">
+    <div class="main-info-img"></div>
+    <div class="main-info-text">
+      <span class="brand-badge"><span class="brand-badge-dot"></span><span class="brand-badge-text">POKEMON</span></span>
+      <div class="main-info-code">SV · M5</div>
+      <div class="main-info-title">어비스아이 (Abyss Eye)</div>
+      <div class="main-info-date">발매일: 26.04.22</div>
+    </div>
+  </div>
+
+  <!-- 카드 수록 정보 -->
+  <div class="info-row">
+    <div class="info-count">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><rect x="4" y="6" width="13" height="15" rx="2"/><path d="M9 3h9a2 2 0 012 2v11" opacity="0.55"/></svg>
+      총 118 카드 수록
+    </div>
+  </div>
+  <div style="padding:0 16px 10px;">
+    <div class="info-tip">카드를 클릭하여 시세를 확인해보세요</div>
+  </div>
+
+  <!-- 카드 그리드 -->
+  <div class="card-grid">
+    <div class="inner-card">
+      <div class="inner-card-img"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="18" height="18" rx="2"/><circle cx="9" cy="9" r="2"/><path d="M21 15l-5-5L5 21"/></svg></div>
+      <div class="inner-card-num">001/118</div>
+    </div>
+    <div class="inner-card">
+      <div class="inner-card-img"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="18" height="18" rx="2"/><circle cx="9" cy="9" r="2"/><path d="M21 15l-5-5L5 21"/></svg></div>
+      <div class="inner-card-num">002/118</div>
+    </div>
+    <div class="inner-card">
+      <div class="inner-card-img"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="18" height="18" rx="2"/><circle cx="9" cy="9" r="2"/><path d="M21 15l-5-5L5 21"/></svg></div>
+      <div class="inner-card-num">003/118</div>
+    </div>
+    <div class="inner-card">
+      <div class="inner-card-img"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="18" height="18" rx="2"/><circle cx="9" cy="9" r="2"/><path d="M21 15l-5-5L5 21"/></svg></div>
+      <div class="inner-card-num">004/118</div>
+    </div>
+    <div class="inner-card">
+      <div class="inner-card-img"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="18" height="18" rx="2"/><circle cx="9" cy="9" r="2"/><path d="M21 15l-5-5L5 21"/></svg></div>
+      <div class="inner-card-num">005/118</div>
+    </div>
+    <div class="inner-card">
+      <div class="inner-card-img"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="18" height="18" rx="2"/><circle cx="9" cy="9" r="2"/><path d="M21 15l-5-5L5 21"/></svg></div>
+      <div class="inner-card-num">006/118</div>
+    </div>
+    <div class="inner-card">
+      <div class="inner-card-img"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="18" height="18" rx="2"/><circle cx="9" cy="9" r="2"/><path d="M21 15l-5-5L5 21"/></svg></div>
+      <div class="inner-card-num">007/118</div>
+    </div>
+    <div class="inner-card">
+      <div class="inner-card-img"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="18" height="18" rx="2"/><circle cx="9" cy="9" r="2"/><path d="M21 15l-5-5L5 21"/></svg></div>
+      <div class="inner-card-num">008/118</div>
+    </div>
+    <div class="inner-card">
+      <div class="inner-card-img"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="18" height="18" rx="2"/><circle cx="9" cy="9" r="2"/><path d="M21 15l-5-5L5 21"/></svg></div>
+      <div class="inner-card-num">009/118</div>
+    </div>
+    <div class="inner-card">
+      <div class="inner-card-img"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="18" height="18" rx="2"/><circle cx="9" cy="9" r="2"/><path d="M21 15l-5-5L5 21"/></svg></div>
+      <div class="inner-card-num">010/118</div>
+    </div>
+  </div>
+
+  <!-- 페이지네이션 -->
+  <div class="pagination-wrap">
+    <button class="page-nav-btn"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M15 18l-6-6 6-6"/></svg></button>
+    <div class="page-num active">1</div>
+    <div class="page-num">2</div>
+    <div class="page-num">3</div>
+    <div class="page-num">4</div>
+    <div class="page-num">5</div>
+    <div class="page-num">6</div>
+    <div class="page-num">7</div>
+    <button class="page-nav-btn"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 18l6-6-6-6"/></svg></button>
+  </div>
+
+</div>
+
+</body>
+</html>

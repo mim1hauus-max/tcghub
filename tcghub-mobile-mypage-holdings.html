@@ -1,0 +1,530 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>TCG Hub - 마이페이지</title>
+<style>
+  :root{
+    --brand-primary:#19dfdf;
+    --brand-primary-subtle:#cffafa;
+    --brand-primary-text:#066666;
+    --bg-page:#f7f6f2;
+    --bg-surface:#ffffff;
+    --bg-muted:#edece8;
+    --border-default:#d9d8d3;
+    --border-subtle:#edece8;
+    --border-strong:#b8b7b2;
+    --text-primary:#0d0d0d;
+    --text-secondary:#666560;
+    --text-tertiary:#888780;
+    --text-muted:#999894;
+    --up:#16a34a;
+    --up-subtle:#dcfce7;
+    --up-text:#166534;
+    --pokemon-primary:#ffd700;
+    --pokemon-primary-subtle:#fef9c3;
+    --pokemon-primary-text:#854d0e;
+  }
+  *{margin:0;padding:0;box-sizing:border-box;}
+  body{
+    font-family:'Pretendard','Noto Sans KR',-apple-system,sans-serif;
+    background:var(--bg-page);
+    color:var(--text-primary);
+    max-width:480px;
+    margin:0 auto;
+    min-height:100vh;
+    position:relative;
+    padding-bottom:76px;
+  }
+
+  /* Header */
+  .header{
+    position:sticky;top:0;z-index:10;
+    background:var(--bg-surface);
+    border-bottom:1px solid var(--border-subtle);
+    display:flex;align-items:center;justify-content:space-between;
+    padding:12px 16px;
+  }
+  .logo-group{display:flex;align-items:center;gap:8px;}
+  .logo-mark{
+    width:32px;height:32px;border-radius:8px;
+    background:var(--brand-primary);
+    display:flex;align-items:center;justify-content:center;
+    font-weight:700;font-size:11px;color:#ffffff;
+    flex-shrink:0;
+  }
+  .logo-text{font-weight:700;font-size:16px;color:var(--text-primary);}
+  .header-icons{display:flex;align-items:center;gap:14px;}
+  .icon-btn{width:22px;height:22px;display:flex;align-items:center;justify-content:center;}
+  .avatar-sm{
+    width:28px;height:28px;border-radius:50%;
+    background:var(--bg-surface);
+    border:1px solid var(--brand-primary);
+    display:flex;align-items:center;justify-content:center;
+    font-size:12px;font-weight:600;color:var(--brand-primary-text);
+  }
+
+  /* Page header */
+  .page-title{
+    padding:20px 16px 16px;
+    font-size:20px;font-weight:700;
+  }
+
+  .user-row{
+    display:flex;align-items:center;justify-content:space-between;
+    padding:0 16px 20px;
+    border-bottom:1px solid var(--border-subtle);
+    margin-bottom:20px;
+  }
+  .user-left{display:flex;align-items:center;gap:10px;}
+  .avatar-lg{
+    width:40px;height:40px;border-radius:50%;
+    background:var(--bg-surface);
+    border:1px solid var(--brand-primary);
+    display:flex;align-items:center;justify-content:center;
+    font-size:15px;font-weight:600;color:var(--brand-primary-text);
+    flex-shrink:0;
+  }
+  .user-name{font-size:15px;font-weight:600;color:var(--text-primary);}
+  .user-sub{font-size:11px;color:var(--text-tertiary);margin-top:2px;}
+  .btn-outline{
+    display:flex;align-items:center;gap:4px;
+    background:var(--bg-surface);
+    border:1px solid var(--border-default);
+    border-radius:8px;
+    padding:6px 10px;
+    font-size:13px;font-weight:500;color:var(--text-secondary);
+  }
+
+  /* Summary section */
+  .section{padding:0 16px 24px;}
+  .section-title{font-size:14px;font-weight:600;margin-bottom:10px;}
+
+  .summary-card{
+    background:var(--bg-surface);
+    border:1px solid var(--border-strong);
+    border-radius:16px;
+    padding:20px 16px;
+  }
+  .summary-totals{
+    display:flex;align-items:center;justify-content:space-between;
+    margin-bottom:14px;
+  }
+  .summary-col{display:flex;flex-direction:column;gap:2px;}
+  .summary-label{font-size:12px;color:var(--text-secondary);}
+  .summary-value{font-size:20px;font-weight:700;letter-spacing:-0.2px;}
+  .summary-value.muted{color:var(--text-secondary);text-decoration:none;}
+  .summary-arrow{font-size:16px;color:var(--text-tertiary);}
+
+  .change-pill{
+    display:inline-flex;align-items:center;gap:4px;
+    background:var(--up-subtle);
+    color:var(--up-text);
+    border-radius:9999px;
+    padding:3px 8px;
+    font-size:11px;font-weight:500;
+    white-space:nowrap;
+  }
+  .change-pill .arrow{font-size:9px;}
+
+  .summary-divider{height:1px;background:var(--border-subtle);margin:14px 0;}
+  .summary-counts{display:flex;align-items:center;gap:14px;}
+  .count-group{display:flex;align-items:center;gap:6px;font-size:12px;}
+  .count-group .label{color:var(--text-tertiary);}
+  .count-group .value{font-weight:600;color:var(--text-secondary);}
+  .count-sep{width:1px;height:14px;background:var(--border-default);}
+
+  /* Top card */
+  .top-card{
+    background:var(--bg-surface);
+    border:1px solid var(--border-strong);
+    border-radius:16px;
+    padding:16px;
+    position:relative;
+    overflow:hidden;
+  }
+  .top-card-badge{
+    position:absolute;top:-6px;left:-6px;
+    width:34px;height:22px;
+    background:var(--bg-muted);
+    border-radius:4px;
+    transform:rotate(-20deg);
+  }
+  .brand-badge{
+    display:inline-flex;align-items:center;gap:4px;
+    background:var(--pokemon-primary-subtle);
+    border-radius:9999px;
+    padding:2px 8px;
+    margin-bottom:8px;
+  }
+  .brand-badge-dot{width:6px;height:6px;border-radius:3px;background:var(--pokemon-primary);}
+  .brand-badge-text{font-size:10px;font-weight:600;color:var(--pokemon-primary-text);}
+
+  .top-card-info{display:flex;gap:12px;padding-bottom:12px;border-bottom:1px solid var(--border-subtle);margin-bottom:12px;}
+  .card-thumb{width:48px;height:64px;background:var(--bg-muted);border-radius:6px;flex-shrink:0;}
+  .card-text-sub{font-size:11px;color:var(--text-tertiary);margin-bottom:2px;}
+  .card-text-main{font-size:13px;font-weight:600;color:var(--text-primary);overflow:hidden;text-overflow:ellipsis;white-space:nowrap;}
+
+  .top-card-foot{display:flex;align-items:center;justify-content:space-between;}
+  .foot-label{font-size:13px;color:var(--text-secondary);}
+  .foot-values{display:flex;flex-direction:column;align-items:flex-end;gap:4px;}
+  .foot-value{font-size:16px;font-weight:700;}
+
+  /* Chart card */
+  .chart-card{
+    background:var(--bg-surface);
+    border:1px solid var(--border-strong);
+    border-radius:16px;
+    padding:16px;
+    box-shadow:0 1px 1.5px rgba(0,0,0,0.06);
+  }
+  .chart-head{display:flex;align-items:center;justify-content:space-between;margin-bottom:14px;}
+  .range-tabs{display:flex;gap:6px;}
+  .range-tab{
+    font-size:12px;font-weight:500;
+    padding:4px 9px;border-radius:8px;
+    border:1px solid var(--border-default);
+    background:var(--bg-surface);
+    color:var(--text-secondary);
+  }
+  .range-tab.active{background:var(--text-secondary);color:#fff;border-color:var(--text-secondary);}
+
+  .chart-wrap{
+    background:var(--bg-page);
+    border-radius:12px;
+    padding:14px 10px;
+    margin-bottom:14px;
+  }
+  .chart-svg{width:100%;height:120px;display:block;}
+  .chart-dates{display:flex;justify-content:space-between;font-size:9px;color:var(--text-tertiary);margin-top:6px;padding:0 4px;}
+
+  .metrics-grid{display:grid;grid-template-columns:1fr 1fr;gap:8px;}
+  .metric-box{
+    background:var(--bg-surface);
+    border:1px solid var(--border-subtle);
+    border-radius:10px;
+    padding:10px 8px;
+    text-align:center;
+  }
+  .metric-label{font-size:11px;color:var(--text-muted);margin-bottom:4px;}
+  .metric-value{font-size:14px;font-weight:600;color:var(--text-primary);}
+  .metric-value.up{color:var(--up);}
+
+  /* Filter tabs */
+  .filter-bar{
+    display:flex;align-items:center;justify-content:space-between;
+    padding:0 16px 12px;
+  }
+  .pill-tabs{display:flex;gap:8px;}
+  .pill-tab{
+    font-size:13px;font-weight:600;
+    padding:6px 12px;border-radius:9999px;
+    border:1px solid var(--border-default);
+    background:var(--bg-surface);
+    color:var(--text-secondary);
+  }
+  .pill-tab.active{background:var(--text-secondary);color:#fff;border-color:var(--text-secondary);}
+  .btn-add{
+    display:flex;align-items:center;gap:4px;
+    background:var(--bg-surface);
+    border:1px solid var(--border-default);
+    border-radius:8px;
+    padding:6px 10px;
+    font-size:13px;font-weight:500;color:var(--text-secondary);
+  }
+
+  /* Card list */
+  .card-list{display:flex;flex-direction:column;gap:12px;padding:0 16px;}
+  .holding-card{
+    background:var(--bg-surface);
+    border:1px solid var(--border-default);
+    border-radius:14px;
+    padding:14px;
+  }
+  .holding-top{display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:10px;}
+  .holding-body{display:flex;gap:12px;}
+  .holding-thumb{width:48px;height:64px;background:var(--bg-muted);border-radius:6px;flex-shrink:0;}
+  .holding-info{flex:1;min-width:0;}
+  .psa-tag{
+    display:inline-block;
+    background:var(--brand-primary-subtle);
+    border:1px solid var(--brand-primary);
+    border-radius:6px;
+    padding:1px 6px;
+    font-size:10px;font-weight:500;color:var(--brand-primary-text);
+    margin-top:6px;margin-right:6px;
+  }
+  .buy-price{font-size:12px;color:var(--text-secondary);}
+  .holding-footer{
+    display:flex;align-items:center;justify-content:space-between;
+    margin-top:12px;padding-top:12px;border-top:1px solid var(--border-subtle);
+  }
+  .delete-icon{width:18px;height:18px;color:var(--text-tertiary);}
+
+  /* Bottom nav */
+  .bottom-nav{
+    position:fixed;bottom:0;left:0;right:0;
+    max-width:480px;margin:0 auto;
+    background:var(--bg-surface);
+    border-top:1px solid var(--border-subtle);
+    display:flex;
+    padding:6px 0 calc(6px + env(safe-area-inset-bottom));
+    z-index:20;
+  }
+  .nav-item{
+    flex:1;display:flex;flex-direction:column;align-items:center;gap:4px;
+    font-size:11px;color:var(--text-tertiary);font-weight:500;
+    padding:4px 0;
+  }
+  .nav-item.active{color:var(--brand-primary-text);}
+  .nav-item svg{width:22px;height:22px;}
+</style>
+</head>
+<body>
+
+  <!-- Header -->
+  <div class="header">
+    <div class="logo-group">
+      <div class="logo-mark">TCG</div>
+      <div class="logo-text">TCG Hub</div>
+    </div>
+    <div class="header-icons">
+      <div class="icon-btn">
+        <svg viewBox="0 0 24 24" fill="none" stroke="#888780" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="7"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
+      </div>
+      <div class="avatar-sm">카</div>
+    </div>
+  </div>
+
+  <!-- Page Title -->
+  <div class="page-title">마이페이지</div>
+
+  <!-- User row -->
+  <div class="user-row">
+    <div class="user-left">
+      <div class="avatar-lg">카</div>
+      <div>
+        <div class="user-name">카카오2066</div>
+        <div class="user-sub">로그인됨 · 모든 기기에서 자동 동기화</div>
+      </div>
+    </div>
+    <button class="btn-outline">
+      로그아웃
+      <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#666560" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"/><polyline points="16 17 21 12 16 7"/><line x1="21" y1="12" x2="9" y2="12"/></svg>
+    </button>
+  </div>
+
+  <!-- 포트폴리오 요약 -->
+  <div class="section">
+    <div class="section-title">포트폴리오 요약</div>
+    <div class="summary-card">
+      <div class="summary-totals">
+        <div class="summary-col">
+          <div class="summary-label">총 매입가</div>
+          <div class="summary-value muted">₩1,232</div>
+        </div>
+        <div class="summary-arrow">→</div>
+        <div class="summary-col" style="align-items:flex-end;">
+          <div class="summary-label">총 평가액</div>
+          <div class="summary-value">₩185,407</div>
+        </div>
+      </div>
+      <div style="display:flex;justify-content:center;margin-bottom:14px;">
+        <span class="change-pill"><span class="arrow">▲</span> +₩184,175 (14,950%)</span>
+      </div>
+      <div class="summary-divider"></div>
+      <div class="summary-counts" style="justify-content:center;">
+        <div class="count-group"><span class="label">보유 카드</span><span class="value">3종</span></div>
+        <div class="count-sep"></div>
+        <div class="count-group"><span class="label">관심 카드</span><span class="value">5종</span></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- 최고 수익 카드 -->
+  <div class="section">
+    <div class="section-title">최고 수익 카드</div>
+    <div class="top-card">
+      <div class="top-card-badge"></div>
+      <div class="top-card-info">
+        <div class="card-thumb"></div>
+        <div style="flex:1;min-width:0;">
+          <div class="brand-badge"><span class="brand-badge-dot"></span><span class="brand-badge-text">POKEMON</span></div>
+          <div class="card-text-sub">Mewtwo ex SAR [M5 234/165]</div>
+          <div class="card-text-main">Pikachu ex SAR [M2a 234/193]</div>
+        </div>
+      </div>
+      <div class="top-card-foot">
+        <div class="foot-label">총 평가액</div>
+        <div class="foot-values">
+          <div class="foot-value">₩185,407</div>
+          <span class="change-pill"><span class="arrow">▲</span> +₩184,175 (14,950%)</span>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- 차트 -->
+  <div class="section">
+    <div class="chart-card">
+      <div class="chart-head">
+        <div class="section-title" style="margin:0;">포트폴리오 평가액 추이</div>
+      </div>
+      <div class="range-tabs" style="margin-bottom:14px;">
+        <button class="range-tab active">30일</button>
+        <button class="range-tab">90일</button>
+        <button class="range-tab">180일</button>
+        <button class="range-tab">전체</button>
+      </div>
+      <div class="chart-wrap">
+        <svg class="chart-svg" viewBox="0 0 320 120" preserveAspectRatio="none">
+          <polyline points="10,95 35,85 60,78 85,90 110,70 135,55 160,60 185,45 210,38 235,42 260,30 285,20 310,15"
+            fill="none" stroke="#16a34a" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+          <polygon points="10,95 35,85 60,78 85,90 110,70 135,55 160,60 185,45 210,38 235,42 260,30 285,20 310,15 310,120 10,120"
+            fill="#16a34a" opacity="0.08"/>
+        </svg>
+        <div class="chart-dates">
+          <span>2025.08</span><span>2025.12</span><span>2026.05</span>
+        </div>
+      </div>
+      <div class="metrics-grid">
+        <div class="metric-box">
+          <div class="metric-label">최고 평가액</div>
+          <div class="metric-value">₩185,407</div>
+        </div>
+        <div class="metric-box">
+          <div class="metric-label">최저 평가액</div>
+          <div class="metric-value">₩1,232</div>
+        </div>
+        <div class="metric-box">
+          <div class="metric-label">기간 수익률</div>
+          <div class="metric-value up">+14,950%</div>
+        </div>
+        <div class="metric-box">
+          <div class="metric-label">최고 수익 카드(30일)</div>
+          <div class="metric-value">뮤츠 ex SAR</div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Filter bar -->
+  <div class="filter-bar">
+    <div class="pill-tabs">
+      <button class="pill-tab active">보유카드</button>
+      <button class="pill-tab">관심 카드</button>
+      <button class="pill-tab">분포</button>
+    </div>
+    <button class="btn-add">
+      <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#666560" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="16"/><line x1="8" y1="12" x2="16" y2="12"/></svg>
+      카드 추가
+    </button>
+  </div>
+
+  <!-- Card list -->
+  <div class="card-list">
+
+    <div class="holding-card">
+      <div style="display:flex;align-items:flex-start;justify-content:space-between;">
+        <div class="brand-badge"><span class="brand-badge-dot"></span><span class="brand-badge-text">POKEMON</span></div>
+        <svg class="delete-icon" viewBox="0 0 24 24" fill="none" stroke="#888780" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><polyline points="3 6 5 6 21 6"/><path d="M19 6l-1 14a2 2 0 0 1-2 2H8a2 2 0 0 1-2-2L5 6"/><path d="M10 11v6"/><path d="M14 11v6"/><path d="M9 6V4a1 1 0 0 1 1-1h4a1 1 0 0 1 1 1v2"/></svg>
+      </div>
+      <div class="holding-body" style="margin-top:10px;">
+        <div class="holding-thumb"></div>
+        <div class="holding-info">
+          <div class="card-text-sub">Mewtwo ex SAR [M5 234/165]</div>
+          <div class="card-text-main">Pikachu ex SAR [M2a 234/193]</div>
+          <div style="margin-top:6px;">
+            <span class="psa-tag">PSA 10</span>
+            <span class="buy-price">매입 ¥2,900 · 1장</span>
+          </div>
+        </div>
+      </div>
+      <div class="holding-footer" style="justify-content:flex-end;">
+        <div style="text-align:right;">
+          <div style="font-size:11px;color:var(--text-secondary);margin-bottom:2px;">총 평가액</div>
+          <div style="font-size:16px;font-weight:700;">₩185,407</div>
+          <span class="change-pill" style="margin-top:4px;"><span class="arrow">▲</span> +₩184,175 (14,950%)</span>
+        </div>
+      </div>
+    </div>
+
+    <div class="holding-card">
+      <div style="display:flex;align-items:flex-start;justify-content:space-between;">
+        <div class="brand-badge"><span class="brand-badge-dot"></span><span class="brand-badge-text">POKEMON</span></div>
+        <svg class="delete-icon" viewBox="0 0 24 24" fill="none" stroke="#888780" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><polyline points="3 6 5 6 21 6"/><path d="M19 6l-1 14a2 2 0 0 1-2 2H8a2 2 0 0 1-2-2L5 6"/><path d="M10 11v6"/><path d="M14 11v6"/><path d="M9 6V4a1 1 0 0 1 1-1h4a1 1 0 0 1 1 1v2"/></svg>
+      </div>
+      <div class="holding-body" style="margin-top:10px;">
+        <div class="holding-thumb"></div>
+        <div class="holding-info">
+          <div class="card-text-sub">Mewtwo ex SAR [M5 234/165]</div>
+          <div class="card-text-main">Pikachu ex SAR [M2a 234/193]</div>
+          <div style="margin-top:6px;">
+            <span class="psa-tag">PSA 10</span>
+            <span class="buy-price">매입 ¥2,900 · 1장</span>
+          </div>
+        </div>
+      </div>
+      <div class="holding-footer" style="justify-content:flex-end;">
+        <div style="text-align:right;">
+          <div style="font-size:11px;color:var(--text-secondary);margin-bottom:2px;">총 평가액</div>
+          <div style="font-size:16px;font-weight:700;">₩185,407</div>
+          <span class="change-pill" style="margin-top:4px;"><span class="arrow">▲</span> +₩184,175 (14,950%)</span>
+        </div>
+      </div>
+    </div>
+
+    <div class="holding-card">
+      <div style="display:flex;align-items:flex-start;justify-content:space-between;">
+        <div class="brand-badge"><span class="brand-badge-dot"></span><span class="brand-badge-text">POKEMON</span></div>
+        <svg class="delete-icon" viewBox="0 0 24 24" fill="none" stroke="#888780" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><polyline points="3 6 5 6 21 6"/><path d="M19 6l-1 14a2 2 0 0 1-2 2H8a2 2 0 0 1-2-2L5 6"/><path d="M10 11v6"/><path d="M14 11v6"/><path d="M9 6V4a1 1 0 0 1 1-1h4a1 1 0 0 1 1 1v2"/></svg>
+      </div>
+      <div class="holding-body" style="margin-top:10px;">
+        <div class="holding-thumb"></div>
+        <div class="holding-info">
+          <div class="card-text-sub">Mewtwo ex SAR [M5 234/165]</div>
+          <div class="card-text-main">Pikachu ex SAR [M2a 234/193]</div>
+          <div style="margin-top:6px;">
+            <span class="psa-tag">PSA 10</span>
+            <span class="buy-price">매입 ¥2,900 · 1장</span>
+          </div>
+        </div>
+      </div>
+      <div class="holding-footer" style="justify-content:flex-end;">
+        <div style="text-align:right;">
+          <div style="font-size:11px;color:var(--text-secondary);margin-bottom:2px;">총 평가액</div>
+          <div style="font-size:16px;font-weight:700;">₩185,407</div>
+          <span class="change-pill" style="margin-top:4px;"><span class="arrow">▲</span> +₩184,175 (14,950%)</span>
+        </div>
+      </div>
+    </div>
+
+  </div>
+
+  <!-- Bottom nav -->
+  <div class="bottom-nav">
+    <div class="nav-item">
+      <svg viewBox="0 0 24 24" fill="none" stroke="#888780" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M3 9l9-7 9 7"/><path d="M5 10v10a1 1 0 0 0 1 1h12a1 1 0 0 0 1-1V10"/></svg>
+      홈
+    </div>
+    <div class="nav-item">
+      <svg viewBox="0 0 24 24" fill="none" stroke="#888780" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><polyline points="3 17 9 11 13 15 21 7"/><polyline points="14 7 21 7 21 14"/></svg>
+      시세
+    </div>
+    <div class="nav-item">
+      <svg viewBox="0 0 24 24" fill="none" stroke="#888780" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M4 4h16v12H7l-3 3V4z"/><line x1="8" y1="8" x2="16" y2="8"/><line x1="8" y1="11" x2="13" y2="11"/></svg>
+      소식
+    </div>
+    <div class="nav-item">
+      <svg viewBox="0 0 24 24" fill="none" stroke="#888780" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="7" height="7" rx="1"/><rect x="14" y="3" width="7" height="7" rx="1"/><rect x="3" y="14" width="7" height="7" rx="1"/><rect x="14" y="14" width="7" height="7" rx="1"/></svg>
+      카드 정보
+    </div>
+    <div class="nav-item active">
+      <svg viewBox="0 0 24 24" fill="none" stroke="#066666" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
+      마이페이지
+    </div>
+  </div>
+
+</body>
+</html>

@@ -1,0 +1,311 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>TCG Hub — 카드 상세 (Mobile)</title>
+<link href="https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+:root {
+  --brand: #19DFDF;
+  --brand-subtle: #CFFAFA;
+  --brand-text: #066666;
+  --price-up: #16A34A;
+  --price-up-subtle: #DCFCE7;
+  --price-up-text: #166534;
+  --price-down: #DC2626;
+  --price-down-subtle: #FEE2E2;
+  --price-down-text: #991B1B;
+  --pk-subtle: #FEF9C3;
+  --pk: #FFD700;
+  --pk-text: #854D0E;
+  --bg-page: #F7F6F2;
+  --bg-surface: #FFFFFF;
+  --bg-muted: #EDECE8;
+  --border: #D9D8D3;
+  --border-subtle: #EDECE8;
+  --text-primary: #0D0D0D;
+  --text-secondary: #666560;
+  --text-tertiary: #888780;
+  --radius-sm: 6px;
+  --radius-md: 8px;
+  --radius-lg: 12px;
+  --radius-xl: 16px;
+  --font: 'Noto Sans KR', sans-serif;
+}
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+html, body { max-width: 480px; margin: 0 auto; background: #2C2C2A; }
+body { font-family: var(--font); color: var(--text-primary); font-size: 14px; line-height: 1.5; -webkit-font-smoothing: antialiased; }
+button { border: none; background: none; cursor: pointer; font-family: var(--font); }
+
+/* 전체화면 슬라이드 패널 (모바일에서는 PC의 사이드 패널이 전체를 덮음) */
+.detail-panel {
+  background: var(--bg-surface);
+  min-height: 100vh;
+  position: relative;
+}
+
+/* 헤더 */
+.detail-header {
+  display: flex; align-items: center; justify-content: space-between;
+  padding: 14px 16px; border-bottom: 1px solid var(--border-subtle);
+  position: sticky; top: 0; background: var(--bg-surface); z-index: 10;
+}
+.icon-btn { width: 24px; height: 24px; display: flex; align-items: center; justify-content: center; color: var(--text-primary); flex-shrink: 0; }
+.icon-btn svg { width: 22px; height: 22px; }
+.header-actions { display: flex; gap: 14px; align-items: center; }
+
+/* 메인 정보 */
+.main-info { display: flex; gap: 14px; padding: 18px 16px; border-bottom: 1px solid var(--border); }
+.main-info-img { width: 64px; height: 86px; border-radius: 8px; background: var(--bg-muted); flex-shrink: 0; }
+.main-info-text { flex: 1; min-width: 0; }
+.main-info-header { display: flex; align-items: center; justify-content: space-between; margin-bottom: 6px; }
+.brand-badge { display: inline-flex; align-items: center; gap: 4px; padding: 2px 8px; border-radius: 9999px; background: var(--pk-subtle); }
+.brand-badge-dot { width: 6px; height: 6px; border-radius: 3px; background: var(--pk); }
+.brand-badge-text { font-size: 11px; font-weight: 600; color: var(--pk-text); }
+.fav-icon { width: 22px; height: 22px; color: var(--text-tertiary); flex-shrink: 0; }
+.main-info-title { font-size: 15px; font-weight: 600; color: var(--text-primary); line-height: 1.4; margin-bottom: 3px; }
+.main-info-sub { font-size: 13px; color: var(--text-tertiary); }
+
+/* 액션 버튼 */
+.action-row { display: flex; gap: 12px; padding: 16px; }
+.btn-primary {
+  flex: 1; background: var(--brand); color: var(--text-primary);
+  padding: 10px 12px; border-radius: var(--radius-md);
+  font-size: 14px; font-weight: 500; text-align: center;
+}
+.btn-secondary {
+  background: var(--bg-surface); border: 1px solid var(--border);
+  color: var(--text-secondary); padding: 10px 16px; border-radius: var(--radius-md);
+  font-size: 14px; font-weight: 500; white-space: nowrap;
+}
+
+.content-wrap { padding: 0 16px 32px; display: flex; flex-direction: column; gap: 24px; }
+
+/* PSA 10 기준 박스 */
+.price-box { background: var(--bg-page); border-radius: var(--radius-xl); padding: 16px; }
+.price-box-top { display: flex; align-items: flex-start; justify-content: space-between; margin-bottom: 16px; }
+.price-box-label { font-size: 12px; color: var(--text-secondary); margin-bottom: 2px; }
+.price-box-value { font-size: 22px; font-weight: 600; color: var(--text-primary); letter-spacing: -0.01em; }
+.price-box-info { display: flex; align-items: center; gap: 4px; font-size: 10px; color: var(--text-tertiary); white-space: nowrap; }
+.price-box-info svg { width: 14px; height: 14px; flex-shrink: 0; }
+
+.price-grid { display: grid; grid-template-columns: repeat(3, minmax(0,1fr)); gap: 8px; }
+.price-grid-item {
+  border: 1px solid var(--border); border-radius: var(--radius-md);
+  padding: 10px 6px; text-align: center; background: var(--bg-surface);
+}
+.price-grid-item.highlight { background: var(--brand-subtle); border-color: var(--brand); }
+.price-grid-label { font-size: 10px; font-weight: 500; color: var(--text-tertiary); margin-bottom: 2px; }
+.price-grid-value { font-size: 12px; font-weight: 600; color: var(--text-primary); }
+.price-grid-value.brand { color: var(--brand-text); }
+
+/* 차트 */
+.chart-section { display: flex; flex-direction: column; gap: 10px; }
+.chart-header { display: flex; align-items: center; justify-content: space-between; }
+.chart-title { font-size: 14px; font-weight: 600; }
+.period-dropdown { display: flex; align-items: center; gap: 2px; padding: 4px 4px 4px 8px; font-size: 13px; font-weight: 500; color: var(--text-secondary); border-radius: 8px; }
+.period-dropdown svg { width: 16px; height: 16px; }
+.chart-wrap { background: var(--bg-page); border-radius: var(--radius-xl); padding: 12px; }
+.chart-wrap svg { display: block; width: 100%; }
+
+/* 등급별 시세 테이블 */
+.grade-table-section { display: flex; flex-direction: column; gap: 10px; }
+.grade-table-title { font-size: 14px; font-weight: 600; }
+.grade-table-header { display: flex; gap: 8px; padding: 7px 0; border-bottom: 1px solid var(--border-subtle); font-size: 11px; color: var(--text-tertiary); }
+.grade-table-header .col-grade { width: 80px; }
+.grade-table-header .col-price { flex: 1; text-align: right; }
+.grade-table-header .col-change { width: 80px; text-align: right; }
+.grade-row { display: flex; align-items: center; gap: 8px; padding: 9px 0; }
+.grade-name { width: 80px; font-size: 13px; font-weight: 600; color: var(--text-tertiary); }
+.grade-name.active { color: var(--brand-text); }
+.grade-price { flex: 1; text-align: right; font-size: 13px; font-weight: 600; color: var(--text-primary); }
+.grade-change-wrap { width: 80px; display: flex; justify-content: flex-end; }
+.grade-change { font-size: 11px; font-weight: 500; padding: 2px 6px; border-radius: 6px; }
+.grade-change.up { background: var(--price-up-subtle); color: var(--price-up-text); }
+.grade-change.down { background: var(--price-down-subtle); color: var(--price-down-text); }
+
+/* 카드 정보 */
+.info-section { display: flex; flex-direction: column; gap: 10px; }
+.info-title { font-size: 14px; font-weight: 600; }
+.info-row { display: flex; align-items: center; justify-content: space-between; padding: 11px 0; border-bottom: 1px solid var(--border-subtle); font-size: 13px; }
+.info-row:last-child { border-bottom: none; }
+.info-label { color: var(--text-tertiary); }
+.info-value { color: var(--text-primary); text-align: right; }
+</style>
+</head>
+<body>
+
+<div class="detail-panel">
+
+  <!-- 헤더 -->
+  <div class="detail-header">
+    <button class="icon-btn"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M8 3H5a2 2 0 00-2 2v3M16 3h3a2 2 0 012 2v3M8 21H5a2 2 0 01-2-2v-3M16 21h3a2 2 0 002-2v-3"/></svg></button>
+    <div class="header-actions">
+      <button class="icon-btn"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="18" cy="5" r="3"/><circle cx="6" cy="12" r="3"/><circle cx="18" cy="19" r="3"/><path d="M8.6 13.5l6.8 4M15.4 6.5l-6.8 4"/></svg></button>
+      <button class="icon-btn"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M18 6L6 18M6 6l12 12"/></svg></button>
+    </div>
+  </div>
+
+  <!-- 메인 정보 -->
+  <div class="main-info">
+    <div class="main-info-img"></div>
+    <div class="main-info-text">
+      <div class="main-info-header">
+        <span class="brand-badge"><span class="brand-badge-dot"></span><span class="brand-badge-text">POKEMON</span></span>
+        <svg class="fav-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M12 4l2.5 5.5 6 .8-4.3 4.2 1 6-5.2-3-5.2 3 1-6L3 10.3l6-.8z"/></svg>
+      </div>
+      <div class="main-info-title">Pikachu ex SAR [M2a 234/193](High class pack "MEGA Dream ex")</div>
+      <div class="main-info-sub">Mewtwo ex SAR [M5 234/165]</div>
+    </div>
+  </div>
+
+  <!-- 액션 버튼 -->
+  <div class="action-row">
+    <button class="btn-primary">포트폴리오 추가</button>
+    <button class="btn-secondary">SNKRDUNK</button>
+  </div>
+
+  <div class="content-wrap">
+
+    <!-- 가격 박스 -->
+    <div class="price-box">
+      <div class="price-box-top">
+        <div>
+          <div class="price-box-label">PSA 10 기준</div>
+          <div class="price-box-value">₩248,000</div>
+        </div>
+        <div class="price-box-info">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="9"/><path d="M12 16v.01M12 8a2 2 0 011.6 3.2L12 13"/></svg>
+          SNKRDUNK 최저 실거래가
+        </div>
+      </div>
+      <div class="price-grid" style="margin-bottom:8px;">
+        <div class="price-grid-item highlight">
+          <div class="price-grid-label">PSA 10</div>
+          <div class="price-grid-value brand">₩979,110</div>
+        </div>
+        <div class="price-grid-item">
+          <div class="price-grid-label">PSA 9</div>
+          <div class="price-grid-value">₩393,162</div>
+        </div>
+        <div class="price-grid-item">
+          <div class="price-grid-label">A급(미개봉)</div>
+          <div class="price-grid-value">₩459,954</div>
+        </div>
+      </div>
+      <div class="price-grid">
+        <div class="price-grid-item">
+          <div class="price-grid-label">BSG 10 BL</div>
+          <div class="price-grid-value brand">₩979,110</div>
+        </div>
+        <div class="price-grid-item">
+          <div class="price-grid-label">BSG 10 GL</div>
+          <div class="price-grid-value">₩393,162</div>
+        </div>
+        <div class="price-grid-item">
+          <div class="price-grid-label">BSG 9.5</div>
+          <div class="price-grid-value">₩459,954</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- 차트 -->
+    <div class="chart-section">
+      <div class="chart-header">
+        <div class="chart-title">가격 · 거래량 히스토리</div>
+        <div class="period-dropdown">
+          전체
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M6 9l6 6 6-6"/></svg>
+        </div>
+      </div>
+      <div class="chart-wrap">
+        <svg viewBox="0 0 400 160" xmlns="http://www.w3.org/2000/svg" preserveAspectRatio="none">
+          <rect x="8" y="120" width="11" height="20" fill="#16A34A18" rx="2"/>
+          <rect x="26" y="110" width="11" height="30" fill="#16A34A18" rx="2"/>
+          <rect x="44" y="125" width="11" height="15" fill="#16A34A18" rx="2"/>
+          <rect x="62" y="105" width="11" height="35" fill="#16A34A18" rx="2"/>
+          <rect x="80" y="115" width="11" height="25" fill="#16A34A18" rx="2"/>
+          <rect x="98" y="100" width="11" height="40" fill="#16A34A18" rx="2"/>
+          <rect x="116" y="90" width="11" height="50" fill="#16A34A18" rx="2"/>
+          <rect x="134" y="118" width="11" height="22" fill="#16A34A18" rx="2"/>
+          <rect x="152" y="108" width="11" height="32" fill="#16A34A18" rx="2"/>
+          <rect x="170" y="95" width="11" height="45" fill="#16A34A18" rx="2"/>
+          <rect x="188" y="112" width="11" height="28" fill="#16A34A18" rx="2"/>
+          <rect x="206" y="102" width="11" height="38" fill="#16A34A18" rx="2"/>
+          <rect x="224" y="88" width="11" height="52" fill="#16A34A18" rx="2"/>
+          <rect x="242" y="118" width="11" height="22" fill="#16A34A18" rx="2"/>
+          <rect x="260" y="105" width="11" height="35" fill="#16A34A18" rx="2"/>
+          <rect x="278" y="92" width="11" height="48" fill="#16A34A18" rx="2"/>
+          <rect x="296" y="82" width="11" height="58" fill="#16A34A18" rx="2"/>
+          <rect x="314" y="74" width="11" height="66" fill="#16A34A30" rx="2"/>
+          <rect x="332" y="64" width="11" height="76" fill="#16A34A45" rx="2"/>
+          <rect x="350" y="56" width="11" height="84" fill="#16A34A60" rx="2"/>
+          <rect x="368" y="48" width="11" height="92" fill="#16A34A80" rx="2"/>
+          <defs>
+            <linearGradient id="lineGrad" x1="0" y1="0" x2="0" y2="1">
+              <stop offset="0%" stop-color="#16A34A" stop-opacity="0.18"/>
+              <stop offset="100%" stop-color="#16A34A" stop-opacity="0"/>
+            </linearGradient>
+          </defs>
+          <path d="M13,95 L31,88 L49,92 L67,78 L85,82 L103,70 L121,60 L139,65 L157,58 L175,52 L193,56 L211,48 L229,42 L247,50 L265,44 L283,38 L301,32 L319,26 L337,18 L355,12 L373,6" fill="none" stroke="#16A34A" stroke-width="2" stroke-linejoin="round"/>
+          <path d="M13,95 L31,88 L49,92 L67,78 L85,82 L103,70 L121,60 L139,65 L157,58 L175,52 L193,56 L211,48 L229,42 L247,50 L265,44 L283,38 L301,32 L319,26 L337,18 L355,12 L373,6 L373,140 L13,140 Z" fill="url(#lineGrad)"/>
+          <circle cx="373" cy="6" r="4" fill="#16A34A"/>
+          <text x="2" y="22" font-size="9" fill="#888780" font-family="sans-serif">₩250만</text>
+          <text x="2" y="84" font-size="9" fill="#888780" font-family="sans-serif">₩50만</text>
+          <text x="2" y="142" font-size="9" fill="#888780" font-family="sans-serif">₩50만</text>
+          <text x="8" y="155" font-size="9" fill="#888780" font-family="sans-serif">2025.08</text>
+          <text x="172" y="155" font-size="9" fill="#888780" font-family="sans-serif">2025.12</text>
+          <text x="338" y="155" font-size="9" fill="#888780" font-family="sans-serif">2026.05</text>
+        </svg>
+      </div>
+    </div>
+
+    <!-- 등급별 시세 -->
+    <div class="grade-table-section">
+      <div class="grade-table-title">등급별 시세</div>
+      <div>
+        <div class="grade-table-header">
+          <div class="col-grade">등급</div>
+          <div class="col-price">가격</div>
+          <div class="col-change">7일 변동</div>
+        </div>
+        <div class="grade-row" style="border-bottom:1px solid var(--border-subtle);">
+          <div class="grade-name active">PSA 10</div>
+          <div class="grade-price">₩420,000</div>
+          <div class="grade-change-wrap"><span class="grade-change up">▲ +12.4%</span></div>
+        </div>
+        <div class="grade-row" style="border-bottom:1px solid var(--border-subtle);">
+          <div class="grade-name">PSA 9</div>
+          <div class="grade-price">₩280,000</div>
+          <div class="grade-change-wrap"><span class="grade-change up">▲ +12.4%</span></div>
+        </div>
+        <div class="grade-row" style="border-bottom:1px solid var(--border-subtle);">
+          <div class="grade-name">BGS 9.5</div>
+          <div class="grade-price">₩350,000</div>
+          <div class="grade-change-wrap"><span class="grade-change up">▲ +12.4%</span></div>
+        </div>
+        <div class="grade-row">
+          <div class="grade-name">A급 (RAW)</div>
+          <div class="grade-price">₩248,000</div>
+          <div class="grade-change-wrap"><span class="grade-change up">▲ +12.4%</span></div>
+        </div>
+      </div>
+    </div>
+
+    <!-- 카드 정보 -->
+    <div class="info-section">
+      <div class="info-title">카드 정보</div>
+      <div>
+        <div class="info-row"><span class="info-label">희귀도</span><span class="info-value">SAR (Special Art Rare)</span></div>
+        <div class="info-row"><span class="info-label">확장팩</span><span class="info-value">어비스아이 M5</span></div>
+        <div class="info-row"><span class="info-label">발매일</span><span class="info-value">2026.05.22</span></div>
+        <div class="info-row"><span class="info-label">데이터 출처</span><span class="info-value">SNKRDUNK · 24시간 자동 갱신</span></div>
+      </div>
+    </div>
+
+  </div>
+</div>
+
+</body>
+</html>
